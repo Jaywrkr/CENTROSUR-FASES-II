@@ -81,6 +81,12 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
 .nc.wc{border-left-color:var(--warn)!important}
 .nc.wc.sel{border-color:var(--warn)!important;background:var(--warnd)!important}
 
+/* decision note tooltip */
+.ic-decision{background:rgba(139,158,196,.12);border:1px solid rgba(139,158,196,.25);border-radius:3px;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:help;position:relative;flex-shrink:0}
+.decision-tooltip{position:absolute;top:calc(100% + 6px);right:0;width:240px;background:var(--bg1);border:1px solid var(--bd2);border-radius:8px;padding:10px 12px;font-size:10px;color:var(--t2);line-height:1.55;z-index:999;pointer-events:none;opacity:0;transition:opacity .15s;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ic-decision:hover .decision-tooltip{opacity:1}
+.decision-tooltip::before{content:'';position:absolute;top:-5px;right:4px;width:8px;height:8px;background:var(--bg1);border-left:1px solid var(--bd2);border-top:1px solid var(--bd2);transform:rotate(45deg)}
+
 .nc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:3px}
 .nc-name{font-size:11px;font-weight:600;color:var(--t1);line-height:1.3}
 .nc-sub{font-size:9px;color:var(--t3);margin-top:1px;line-height:1.3}
@@ -212,6 +218,38 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
 .warn-comp-bx{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:8px;padding:10px 13px;margin-bottom:4px}
 .warn-comp-t{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:4px}
 .warn-comp-b{font-size:11px;color:rgba(245,158,11,.8);line-height:1.5}
+
+/* ── ORDEN TAB ── */
+.orden-intro{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:12px;color:var(--t2);line-height:1.65}
+.orden-intro strong{color:var(--t1);font-weight:600}
+.orden-phase-block{margin-bottom:28px}
+.orden-phase-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.orden-phase-pill{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;border:1px solid;flex-shrink:0}
+.orden-phase-title{font-size:13px;font-weight:600}
+.orden-phase-year{font-size:11px;color:var(--t3);margin-left:auto}
+.orden-phase-note{font-size:11px;color:var(--t3);font-style:italic;margin-left:8px}
+
+.orden-steps{display:flex;flex-direction:column;gap:6px}
+.orden-step{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;transition:border-color .12s}
+.orden-step:hover{border-color:var(--bd2)}
+.orden-step.parallel{border-left:3px solid var(--bd3)}
+.os-num{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.os-body{flex:1;min-width:0}
+.os-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.os-name{font-size:12px;font-weight:600;color:var(--t1)}
+.os-tags{display:flex;gap:4px;flex-wrap:wrap}
+.os-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.os-tag-par{background:rgba(255,255,255,.06);color:var(--t3)}
+.os-tag-dep{background:rgba(59,130,246,.12);color:#60a5fa}
+.os-tag-warn{background:rgba(245,158,11,.12);color:#fbbf24}
+.os-tag-crit{background:rgba(239,68,68,.12);color:#f87171}
+.os-reason{font-size:11px;color:var(--t2);line-height:1.55}
+.os-dep{font-size:10px;color:var(--t3);margin-top:4px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.os-dep-chip{font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;border:1px solid;cursor:default}
+
+.par-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t4);padding:6px 0 4px 4px;display:flex;align-items:center;gap:6px}
+.par-label::after{content:'';flex:1;height:1px;background:var(--bd);margin-left:4px}
+.par-label::before{content:'⇌';font-size:11px;color:var(--t4)}
 </style>
 </head>
 <body>
@@ -220,8 +258,8 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
   <div class="tb-brand">Coresolutions</div>
   <div class="tb-title">Fortalecimiento integral de la ciberseguridad · CENTROSUR · 2026–2030</div>
   <div class="tb-stats">
-    <div class="spill tot"><span class="sdot"></span>12 componentes</div>
-    <div class="spill ok"><span class="sdot"></span>9 confirmados</div>
+    <div class="spill tot"><span class="sdot"></span>15 componentes</div>
+    <div class="spill ok"><span class="sdot"></span>12 confirmados</div>
     <div class="spill wn"><span class="sdot"></span>3 requieren definición</div>
   </div>
 </div>
@@ -229,6 +267,7 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
 <div class="tab-bar">
   <div class="tab-btn active" data-tab="map">Mapa de dependencias</div>
   <div class="tab-btn" data-tab="hitos">Plan por hitos</div>
+  <div class="tab-btn" data-tab="orden">Orden de implementación</div>
 </div>
 
 <div class="main">
@@ -282,6 +321,11 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
     </div>
   </div>
 
+  <!-- ═══ TAB 3: ORDEN ═══ -->
+  <div class="tab-content" id="tab-orden" style="overflow-y:auto;flex-direction:column">
+    <div id="ordenContent" style="padding:24px;max-width:900px;margin:0 auto;width:100%"></div>
+  </div>
+
 </div>
 
 <script>
@@ -295,6 +339,7 @@ const PNAME={1:'Protección Perimetral',2:'Identidad y Acceso',3:'Servicios y Ri
 const NODES=[
   {id:'fw',phase:1,col:1,name:'FW perimetral Zero Trust',sub:'Usuarios · DC · OT · ISP',status:'ok',clientReq:true,
    badges:['Confirmado'],deps:[],
+   decisionNote:'El técnico de Coresolutions definió tres implementaciones separadas: red de usuarios (hitos 1.x), red de datacenter (hitos 2.x) y red de operaciones OT (hitos 3.x). En el mapa aparecen como un solo nodo porque comparten una única plataforma de gestión y una sola política Zero Trust — pero en la pestaña de hitos están separados porque el perfil de seguridad de cada red es distinto (OT usa IEC 62443 y protocolos industriales que el resto no tiene).',
    what:'NGFW en los cuatro dominios de CENTROSUR: red de usuarios, datacenter, red OT e ISP. IPS con perfil industrial para OT, anti-bot, sandboxing, CDR y microsegmentación por zonas.',
    why:'Primera línea de defensa. Sin visibilidad del tráfico no existe base para ninguna capa posterior. Para una distribuidora eléctrica, OT (SCADA/ICS) es el riesgo de mayor impacto operativo.',
    goal:'Controlar todo el tráfico, microsegmentar zonas, activar inspección profunda y generar logs que alimentan la detección posterior.',
@@ -358,17 +403,17 @@ const NODES=[
    goal:'Evitar fuga de información confidencial de CENTROSUR (datos de clientes, planos de red eléctrica, contratos) a través de herramientas de IA externas.',
    warn:'El cliente lo pidió pero no está definido qué herramientas de IA usa CENTROSUR, qué datos son sensibles en ese contexto y qué nivel de restricción quieren aplicar.',
    actions:['Hacer inventario de qué herramientas de IA usa CENTROSUR actualmente','Clasificar qué tipos de datos considera CENTROSUR como sensibles o confidenciales','Definir política: ¿bloqueo total de IA externa? ¿solo con ciertos datos? ¿solo en dispositivos corporativos?','Confirmar si Microsoft Copilot está licenciado — el control se aplica dentro del tenant corporativo']},
-  {id:'vuln',phase:3,col:3,name:'Vuln. Mgmt y Pentesting continuo',sub:'Escaneo · Parches · Hardening CIS',status:'ok',clientReq:true,
+  {id:'vuln',phase:3,col:3,name:'Vuln. Mgmt y Pentesting continuo',sub:'Escaneo continuo · Ethical hacking · DevSecOps',status:'ok',clientReq:true,
    badges:['Confirmado'],deps:['fw','ept','iam','waf'],
-   what:'Escaneo automatizado de vulnerabilidades, patch management de SO y bases de datos, hardening según CIS Benchmarks, pentesting periódico (ethical hacking controlado), integración DevSecOps.',
-   why:'Efectivo solo cuando ya tienes telemetría real (Fase 1) e identidades claras (Fase 2). Sin esa base, los resultados son parciales y la priorización incorrecta.',
-   goal:'Reducir activamente la superficie de ataque. Los hallazgos del pentesting alimentan reglas del SIEM en Fase 4.',
+   what:'Escaneo automatizado de vulnerabilidades en aplicaciones y servicios expuestos, pentesting periódico (ethical hacking controlado) e integración con pipelines DevSecOps para pruebas de seguridad en despliegues.',
+   why:'El cliente lo pidió explícitamente. Es efectivo solo cuando ya tienes telemetría real de red (Fase 1) e identidades claras (Fase 2). Sin esa base, los resultados son parciales y la priorización incorrecta.',
+   goal:'Identificar y cerrar vulnerabilidades activamente antes de que sean explotadas. Los hallazgos del pentesting alimentan las reglas de detección del SIEM en Fase 4.',
    warn:'',actions:[]},
-  {id:'backup',phase:3,col:3,name:'Respaldos inmutables',sub:'Anti-ransomware · Cifrado en reposo',status:'ok',clientReq:false,
-   badges:['Confirmado'],deps:['fw','iam'],
-   what:'Backups inmutables que no pueden ser cifrados por un atacante. Cifrado de datos en reposo en servidores críticos. Política de retención 3-2-1-1, pruebas periódicas de restauración.',
-   why:'Ransomware es la amenaza de mayor impacto para infraestructura crítica latinoamericana. Los backups requieren que la red esté segmentada (Fase 1) para que el atacante no pueda alcanzarlos.',
-   goal:'Garantizar continuidad operativa ante un incidente de cifrado o destrucción masiva de datos.',
+  {id:'hardening',phase:3,col:3,name:'Fortalecimiento de servicios y sistemas',sub:'Hardening · CIS Benchmarks · Parches',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','ept','iam'],
+   what:'Aplicación de guías CIS Benchmarks o DISA STIGs sobre todos los sistemas. Actualizaciones y patch management de SO, bases de datos y aplicaciones. Validación de configuración segura post-cambio. Incluye DLP perimetral y endpoint como capa de protección de datos en tránsito, reposo y uso.',
+   why:'El cliente lo pidió explícitamente como componente independiente del pentesting. El hardening reduce la superficie de ataque desde adentro — no detecta ataques, los hace más difíciles de ejecutar. Requiere que los FW e identidad estén activos para saber qué sistemas son accesibles y quién los administra.',
+   goal:'Reducir la superficie de ataque en cada sistema individual. Asegurar que ningún servicio o sistema tenga configuraciones inseguras por defecto. Cubre también DLP perimetral y de endpoint solicitado por el cliente.',
    warn:'',actions:[]},
 
   {id:'siem',phase:4,col:4,name:'SIEM · SOAR · UEBA (IA)',sub:'Correlación centralizada · Automatización · IA',status:'ok',clientReq:true,
@@ -396,17 +441,19 @@ const NODES=[
 // ═══════════════════════════════════
 const HITOS_DATA=[
   {
-    phaseId:1,compId:'fw',icon:'🔥',name:'FW perimetral Zero Trust',
+    phaseId:1,compId:'fw-usuarios',icon:'👥',name:'FW Red de Usuarios',
+    parentId:'fw',
     clientReq:true,status:'ok',
     hitos:[
       {num:'1.1',title:'Activación de motores de inspección',tags:['T'],steps:[
-        {t:'Firewall y control de aplicaciones en dominios usuarios/DC/OT/ISP',cl:false},
-        {t:'IPS con perfil de aplicaciones de usuarios (perfil industrial para OT)',cl:false},
+        {t:'Firewall y control de aplicaciones — red de usuarios',cl:false},
+        {t:'IPS con perfil de aplicaciones de usuarios',cl:false},
         {t:'Antivirus, Anti-Bot y Sandboxing',cl:false},
-        {t:'CDR — Desarmado y Reconstrucción de Contenidos',cl:false}
+        {t:'CDR — Desarmado y Reconstrucción de Contenidos',cl:false},
+        {t:'Anti-Phishing y filtros URL',cl:false}
       ]},
       {num:'1.2',title:'Configuración Zero Trust inicial',tags:['T','C'],steps:[
-        {t:'Habilitar reglas de auditoría para identificar aplicaciones y protocolos usados',cl:false},
+        {t:'Habilitar reglas de auditoría para identificar aplicaciones y protocolos usados por usuarios',cl:false},
         {t:'Identificación de usuarios contra fuentes de identidad (AD, Azure AD/Entra ID)',cl:true}
       ]},
       {num:'1.3',title:'Filtros de navegación y DNS',tags:['T'],steps:[
@@ -420,10 +467,10 @@ const HITOS_DATA=[
         {t:'Salida solo a protocolos permitidos: HTTP/HTTPS y DNS controlados',cl:false}
       ]},
       {num:'1.5',title:'Microsegmentación por zonas',tags:['T','C'],steps:[
-        {t:'Zonas: DMZ, DB, App, Management, OT',cl:true},
+        {t:'Zonas: DMZ, DB, App, Management',cl:true},
         {t:'Capas de reglas: Top Section (infraestructura), Inline Layers (microseg.), Bottom Section (bloqueo implícito)',cl:false},
         {t:'Identity Awareness para ZTNA',cl:false},
-        {t:'Application Control en DC y OT',cl:false},
+        {t:'Application Control',cl:false},
         {t:'Threat Prevention en modo Estricto',cl:false}
       ]},
       {num:'1.6',title:'Inspección HTTPS',tags:['T'],steps:[
@@ -433,18 +480,101 @@ const HITOS_DATA=[
       {num:'1.7',title:'Integración con Threat Intelligence',tags:['T'],steps:[
         {t:'Integrar con nube de inteligencia de amenazas',cl:false},
         {t:'Unificar logs en consola de gestión',cl:false},
-        {t:'Alertas tempranas: fuerza bruta, Anti-Bot, picos de tráfico saliente (posible exfiltración)',cl:false}
+        {t:'Alertas tempranas: fuerza bruta, Anti-Bot, picos de tráfico saliente',cl:false}
       ]},
       {num:'1.8',title:'Mantenimiento y operación',tags:['T'],steps:[
         {t:'Habilitar reglas implícitas en registro de Logs',cl:false},
         {t:'Parches virtuales de aplicaciones recién vulneradas',cl:false}
       ]},
       {num:'1.9',title:'Cumplimiento y Zero Trust avanzado',tags:['T','C'],steps:[
-        {t:'Cumplir normativa del sector (NIST CSF, IEC 62443 para OT)',cl:true},
+        {t:'Cumplir normativa del sector (NIST CSF)',cl:true},
         {t:'Gestionar, analizar y generar informes sobre eventos',cl:true},
         {t:'Acceso autenticado Zero Trust a través del proveedor de identidad',cl:false},
         {t:'Playblocks: prevención colaborativa y automatizada de amenazas',cl:false},
         {t:'Asistente de seguridad basado en IA',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'fw-dc',icon:'🏢',name:'FW Red de Datacenter',
+    parentId:'fw',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'2.1',title:'Activación de motores de inspección — DC',tags:['T'],steps:[
+        {t:'Firewall y control de aplicaciones del datacenter',cl:false},
+        {t:'IPS con perfil de aplicaciones del datacenter',cl:false},
+        {t:'Antivirus y Anti-Bot',cl:false}
+      ]},
+      {num:'2.2',title:'Configuración Zero Trust — DC',tags:['T'],steps:[
+        {t:'Habilitar reglas de auditoría para identificar aplicaciones y protocolos del datacenter',cl:false}
+      ]},
+      {num:'2.3',title:'Política de menor privilegio — DC',tags:['T'],steps:[
+        {t:'Tráfico entrante: cerrar todo por defecto',cl:false},
+        {t:'Exponer solo aplicaciones y protocolos del DC (cf. 2.2)',cl:false},
+        {t:'Tráfico saliente con restricción en navegación y aplicaciones',cl:false},
+        {t:'Salida solo a protocolos permitidos: HTTP/HTTPS y DNS controlados',cl:false}
+      ]},
+      {num:'2.4',title:'Microsegmentación por zonas — DC',tags:['T','C'],steps:[
+        {t:'Zonas: DB, App, TI, Management',cl:true},
+        {t:'Capas de reglas: Top Section, Inline Layers por Aplicación, Bottom Section',cl:false},
+        {t:'Identity Awareness',cl:false},
+        {t:'Application Control en el DC',cl:false},
+        {t:'Threat Prevention en modo Estricto',cl:false}
+      ]},
+      {num:'2.5',title:'Inspección HTTPS — DC',tags:['T'],steps:[
+        {t:'Configurar inspección SSL gradualmente con despliegue de CA',cl:false},
+        {t:'Establecer excepciones a la inspección SSL',cl:false}
+      ]},
+      {num:'2.6',title:'Integración con Threat Intelligence — DC',tags:['T'],steps:[
+        {t:'Integrar con nube de inteligencia de amenazas',cl:false},
+        {t:'Monitoreo de la gestión para unificar logs',cl:false},
+        {t:'Alertas tempranas: fuerza bruta, Anti-Bot, picos de tráfico saliente',cl:false}
+      ]},
+      {num:'2.7',title:'Mantenimiento y operación — DC',tags:['T'],steps:[
+        {t:'Habilitar reglas implícitas en registro de Logs',cl:false},
+        {t:'Parches virtuales de aplicaciones recién vulneradas',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'fw-ot',icon:'⚙️',name:'FW Red de Operaciones (OT)',
+    parentId:'fw',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'3.1',title:'Activación de motores de inspección — OT',tags:['T'],steps:[
+        {t:'Firewall y control de aplicaciones — red OT/SCADA',cl:false},
+        {t:'IPS con perfil industrial (protocolos OT: Modbus, DNP3, IEC 104)',cl:false},
+        {t:'Antivirus y Anti-Bot',cl:false}
+      ]},
+      {num:'3.2',title:'Configuración Zero Trust — OT',tags:['T'],steps:[
+        {t:'Habilitar reglas de auditoría para identificar aplicaciones y protocolos de la red OT',cl:false}
+      ]},
+      {num:'3.3',title:'Política de menor privilegio — OT',tags:['T'],steps:[
+        {t:'Tráfico entrante: cerrar todo por defecto',cl:false},
+        {t:'Exponer solo aplicaciones y protocolos de la red OT (cf. 3.2)',cl:false},
+        {t:'Tráfico saliente con restricción estricta',cl:false},
+        {t:'Salida solo a protocolos permitidos: HTTP/HTTPS y DNS controlados',cl:false}
+      ]},
+      {num:'3.4',title:'Microsegmentación por zonas — OT',tags:['T','C'],steps:[
+        {t:'Zonas: OT, App, Management',cl:true},
+        {t:'Separación física/lógica entre red IT y red OT (Purdue Model)',cl:false},
+        {t:'Capas de reglas: Top Section, Inline Layers, Bottom Section',cl:false},
+        {t:'Identity Awareness',cl:false},
+        {t:'Application Control en red OT',cl:false},
+        {t:'Threat Prevention en modo Estricto',cl:false}
+      ]},
+      {num:'3.5',title:'Integración con Threat Intelligence — OT',tags:['T'],steps:[
+        {t:'Integrar con nube de inteligencia de amenazas',cl:false},
+        {t:'Monitoreo en consola para unificar logs',cl:false},
+        {t:'Alertas tempranas: fuerza bruta, Anti-Bot, picos de tráfico saliente',cl:false}
+      ]},
+      {num:'3.6',title:'Mantenimiento y operación — OT',tags:['T'],steps:[
+        {t:'Habilitar reglas implícitas en registro de Logs',cl:false},
+        {t:'Parches virtuales de aplicaciones recién vulneradas',cl:false}
+      ]},
+      {num:'3.7',title:'Logs OT para correlación XDR',tags:['T'],steps:[
+        {t:'Logs de Firewalls OT para correlación extendida con Logs de usuarios',cl:false},
+        {t:'Alineación con IEC 62443 para sistemas industriales',cl:false}
       ]}
     ]
   },
@@ -731,20 +861,24 @@ const HITOS_DATA=[
     ]
   },
   {
-    phaseId:3,compId:'backup',icon:'💾',name:'Respaldos inmutables',
-    clientReq:false,status:'ok',
+    phaseId:3,compId:'hardening',icon:'🔩',name:'Fortalecimiento de servicios y sistemas',
+    clientReq:true,status:'ok',
     hitos:[
-      {num:'B.1',title:'Inventario y clasificación de datos críticos',tags:['T'],steps:[
-        {t:'Inventario de datos críticos de CENTROSUR',cl:false},
-        {t:'Clasificación: operacional, clientes, infraestructura, contratos',cl:false}
+      {num:'H.1',title:'Hardening de sistemas según CIS Benchmarks',tags:['T','C'],steps:[
+        {t:'Aplicación de guías CIS Benchmarks o DISA STIGs por tipo de sistema (SO, DB, apps)',cl:true},
+        {t:'Validación de configuración segura post-cambio',cl:false},
+        {t:'Remediación de configuraciones inseguras por defecto',cl:false}
       ]},
-      {num:'B.2',title:'Arquitectura de respaldo 3-2-1-1',tags:['T'],steps:[
-        {t:'3 copias, 2 medios distintos, 1 offsite, 1 inmutable (air-gapped)',cl:false},
-        {t:'Cifrado en reposo de datos sensibles',cl:false}
+      {num:'H.2',title:'Gestión de parches y actualizaciones',tags:['T','C'],steps:[
+        {t:'Patch management de SO y bases de datos',cl:true},
+        {t:'Ventanas de mantenimiento sin afectar disponibilidad operativa',cl:false},
+        {t:'Validación de integridad post-parche',cl:false}
       ]},
-      {num:'B.3',title:'Pruebas y validación',tags:['T'],steps:[
-        {t:'Pruebas de restauración mensuales obligatorias',cl:false},
-        {t:'Simulacro de ataque ransomware y recuperación',cl:false}
+      {num:'H.3',title:'DLP perimetral y endpoint',tags:['T','C'],steps:[
+        {t:'Monitoreo de flujos de información sensible',cl:true},
+        {t:'Clasificación y etiquetado de datos: Data Classification',cl:true},
+        {t:'Políticas de protección de datos en tránsito, reposo y uso',cl:true},
+        {t:'Canales de fuga cubiertos: correo, USB, portapapeles, impresión, nube',cl:true}
       ]}
     ]
   },
@@ -834,12 +968,14 @@ function buildMap(){
     el.setAttribute('data-id',n.id);
     const depCnt=n.deps.length;
     const linksTo=NODES.filter(x=>x.deps.includes(n.id)).length;
+    const decisionIc=n.decisionNote?`<div class="ic-decision" onclick="event.stopPropagation()">🤔<div class="decision-tooltip">${n.decisionNote}</div></div>`:'';
     el.innerHTML=`
       <div class="nc-top">
         <div><div class="nc-name">${n.name}</div><div class="nc-sub">${n.sub}</div></div>
         <div class="nc-icons">
           ${n.clientReq?'<div class="ic ic-client" title="Solicitado por CENTROSUR">C</div>':''}
           ${n.status==='warn'?'<div class="ic ic-warn" title="Requiere definición">!</div>':''}
+          ${decisionIc}
         </div>
       </div>
       <div class="nc-row">
@@ -955,74 +1091,111 @@ function buildHitos(){
   const byPhase={1:[],2:[],3:[],4:[]};
   HITOS_DATA.forEach(c=>byPhase[c.phaseId].push(c));
 
-  // Build nav + panels
   [1,2,3,4].forEach(ph=>{
     const comps=byPhase[ph];
-    // phase section label
     const secLabel=document.createElement('div');
     secLabel.className='pnav-section';
     secLabel.style.color=phC[ph];
     secLabel.textContent=`Fase ${ph} · ${PYEAR[ph]}`;
     nav.appendChild(secLabel);
 
-    comps.forEach((comp,i)=>{
-      // NAV BUTTON
-      const btn=document.createElement('div');
-      btn.className='cnav-btn';
-      btn.id=`cnav-${comp.compId}`;
-      const warnDot=comp.status==='warn'?`<div class="cnav-badge" style="background:var(--warn)"></div>`:`<div class="cnav-badge" style="background:var(--ok)"></div>`;
-      btn.innerHTML=`<span class="cnav-icon">${comp.icon}</span><span class="cnav-name">${comp.name}</span>${warnDot}`;
-      btn.addEventListener('click',()=>showComp(comp.compId));
-      nav.appendChild(btn);
+    // Group: top-level items (no parentId) and their children
+    const topLevel=comps.filter(c=>!c.parentId);
+    const children=comps.filter(c=>c.parentId);
 
-      // CONTENT PANEL
-      const panel=document.createElement('div');
-      panel.className='comp-panel';
-      panel.id=`cpanel-${comp.compId}`;
+    topLevel.forEach(comp=>{
+      const myChildren=children.filter(c=>c.parentId===comp.compId);
+      const isParent=myChildren.length>0;
 
-      // warn box if needed
-      const nodeData=NODES.find(x=>x.id===comp.compId);
-      if(comp.status==='warn'&&nodeData&&nodeData.warn){
-        const wb=document.createElement('div');
-        wb.className='warn-comp-bx';
-        wb.innerHTML=`<div class="warn-comp-t">⚠ Requiere definición antes de implementar</div><div class="warn-comp-b">${nodeData.warn}</div>`;
-        panel.appendChild(wb);
+      // Build a fake "parent nav header" if this comp has children (it won't have its own panel — children will)
+      if(isParent){
+        // Parent label (not clickable — just groups)
+        const parentLbl=document.createElement('div');
+        parentLbl.style.cssText='display:flex;align-items:center;gap:7px;padding:6px 8px;font-size:10px;font-weight:600;color:'+phC[ph]+';opacity:.8;letter-spacing:.03em';
+        parentLbl.innerHTML=`<span style="font-size:12px">🔥</span><span style="flex:1">${comp.name}</span>`;
+        nav.appendChild(parentLbl);
+        // Children nav buttons — indented
+        myChildren.forEach(child=>{
+          const btn=document.createElement('div');
+          btn.className='cnav-btn';
+          btn.id=`cnav-${child.compId}`;
+          const warnDot=child.status==='warn'?`<div class="cnav-badge" style="background:var(--warn)"></div>`:`<div class="cnav-badge" style="background:var(--ok)"></div>`;
+          btn.innerHTML=`<span class="cnav-icon">${child.icon}</span><span class="cnav-name">${child.name}</span>${warnDot}`;
+          btn.style.paddingLeft='22px';
+          btn.addEventListener('click',()=>showComp(child.compId));
+          nav.appendChild(btn);
+          buildPanel(child,ph,scroll);
+        });
+      } else {
+        // Normal standalone nav button
+        const btn=document.createElement('div');
+        btn.className='cnav-btn';
+        btn.id=`cnav-${comp.compId}`;
+        const warnDot=comp.status==='warn'?`<div class="cnav-badge" style="background:var(--warn)"></div>`:`<div class="cnav-badge" style="background:var(--ok)"></div>`;
+        btn.innerHTML=`<span class="cnav-icon">${comp.icon}</span><span class="cnav-name">${comp.name}</span>${warnDot}`;
+        btn.addEventListener('click',()=>showComp(comp.compId));
+        nav.appendChild(btn);
+        buildPanel(comp,ph,scroll);
       }
-
-      // banner
-      const banner=document.createElement('div');
-      banner.className='comp-banner';
-      banner.style.background=phBG[ph];
-      banner.style.borderColor=phBD[ph];
-      const statusBadge=comp.status==='ok'?'<span class="cbadge cbadge-ok">✓ Confirmado</span>':'<span class="cbadge cbadge-wn">! Requiere definición</span>';
-      const clientBadge=comp.clientReq?'<span class="cbadge cbadge-cl">C Cliente</span>':'';
-      banner.innerHTML=`<span class="comp-banner-icon">${comp.icon}</span><span class="comp-banner-name" style="color:${phC[ph]}">${comp.name}</span><div class="comp-banner-badges">${clientBadge}${statusBadge}</div>`;
-      panel.appendChild(banner);
-
-      // hitos
-      comp.hitos.forEach(h=>{
-        const hitoEl=document.createElement('div');
-        hitoEl.className='hito';
-        const tagsHtml=h.tags.map(t=>`<span class="htag ${t==='C'?'htag-cl':'htag-tc'}">${t==='C'?'C Cliente':'T Técnico'}</span>`).join('');
-        const stepsHtml=h.steps.map(s=>`<div class="step${s.cl?' step-cl':''}"><div class="step-dot"></div><span>${s.t}${s.cl?` <span style="font-size:8px;font-weight:700;background:rgba(59,130,246,.15);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:3px">C</span>`:''}</span></div>`).join('');
-        hitoEl.innerHTML=`<div class="hito-head">
-          <span class="hito-num" style="background:${phBG[ph]};color:${phC[ph]}">${h.num}</span>
-          <div class="hito-title">${h.title}</div>
-          <div class="hito-tags">${tagsHtml}</div>
-        </div><div class="steps">${stepsHtml}</div>`;
-        panel.appendChild(hitoEl);
-      });
-
-      scroll.appendChild(panel);
     });
 
-    // divider between phases
     if(ph<4){const d=document.createElement('div');d.className='pnav-divider';nav.appendChild(d);}
   });
 
-  // activate first
-  const first=HITOS_DATA[0];
-  if(first) showComp(first.compId);
+  // activate first child panel
+  const first=HITOS_DATA.find(c=>!c.parentId)||HITOS_DATA[0];
+  const firstTarget=HITOS_DATA.find(c=>c.parentId===first.compId)||first;
+  if(firstTarget) showComp(firstTarget.compId);
+}
+
+function buildPanel(comp,ph,scroll){
+  const panel=document.createElement('div');
+  panel.className='comp-panel';
+  panel.id=`cpanel-${comp.compId}`;
+
+  // warn box
+  const nodeId=comp.parentId||comp.compId;
+  const nodeData=NODES.find(x=>x.id===nodeId);
+  if(comp.status==='warn'&&nodeData&&nodeData.warn){
+    const wb=document.createElement('div');
+    wb.className='warn-comp-bx';
+    wb.innerHTML=`<div class="warn-comp-t">⚠ Requiere definición antes de implementar</div><div class="warn-comp-b">${nodeData.warn}</div>`;
+    panel.appendChild(wb);
+  }
+
+  // decision note box if parent has one
+  if(comp.parentId&&nodeData&&nodeData.decisionNote){
+    const dn=document.createElement('div');
+    dn.style.cssText='background:rgba(139,158,196,.07);border:1px solid rgba(139,158,196,.15);border-radius:8px;padding:9px 12px;margin-bottom:4px;font-size:11px;color:var(--t3);line-height:1.5;display:flex;align-items:flex-start;gap:7px';
+    dn.innerHTML=`<span style="font-size:14px;flex-shrink:0">🤔</span><span>${nodeData.decisionNote}</span>`;
+    panel.appendChild(dn);
+  }
+
+  // banner
+  const banner=document.createElement('div');
+  banner.className='comp-banner';
+  banner.style.background=phBG[ph];
+  banner.style.borderColor=phBD[ph];
+  const statusBadge=comp.status==='ok'?'<span class="cbadge cbadge-ok">✓ Confirmado</span>':'<span class="cbadge cbadge-wn">! Requiere definición</span>';
+  const clientBadge=comp.clientReq?'<span class="cbadge cbadge-cl">C Cliente</span>':'';
+  banner.innerHTML=`<span class="comp-banner-icon">${comp.icon}</span><span class="comp-banner-name" style="color:${phC[ph]}">${comp.name}</span><div class="comp-banner-badges">${clientBadge}${statusBadge}</div>`;
+  panel.appendChild(banner);
+
+  // hitos
+  comp.hitos.forEach(h=>{
+    const hitoEl=document.createElement('div');
+    hitoEl.className='hito';
+    const tagsHtml=h.tags.map(t=>`<span class="htag ${t==='C'?'htag-cl':'htag-tc'}">${t==='C'?'C Cliente':'T Técnico'}</span>`).join('');
+    const stepsHtml=h.steps.map(s=>`<div class="step${s.cl?' step-cl':''}"><div class="step-dot"></div><span>${s.t}${s.cl?` <span style="font-size:8px;font-weight:700;background:rgba(59,130,246,.15);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:3px">C</span>`:''}</span></div>`).join('');
+    hitoEl.innerHTML=`<div class="hito-head">
+      <span class="hito-num" style="background:${phBG[ph]};color:${phC[ph]}">${h.num}</span>
+      <div class="hito-title">${h.title}</div>
+      <div class="hito-tags">${tagsHtml}</div>
+    </div><div class="steps">${stepsHtml}</div>`;
+    panel.appendChild(hitoEl);
+  });
+
+  scroll.appendChild(panel);
 }
 
 function showComp(compId){
@@ -1038,10 +1211,13 @@ function showComp(compId){
     navBtn.scrollIntoView({block:'nearest',behavior:'smooth'});
   }
 
-  // update topbar
+  // update topbar — show parent context if child
+  const displayName=comp.parentId
+    ? `${HITOS_DATA.find(c=>c.compId===comp.parentId)?.name||''} › ${comp.name}`
+    : comp.name;
   document.getElementById('htbPhase').textContent=`Fase ${ph} · ${pnames[ph]}`;
   document.getElementById('htbPhase').style.color=phC[ph];
-  document.getElementById('htbComp').textContent=comp.name;
+  document.getElementById('htbComp').textContent=displayName;
   document.getElementById('htbCount').textContent=`${comp.hitos.length} hito${comp.hitos.length!==1?'s':''}`;
 
   // show panel
@@ -1067,8 +1243,233 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
   });
 });
 
+// ══════════════════════
+// ORDEN DE IMPLEMENTACIÓN
+// ══════════════════════
+const ORDEN=[
+  {
+    phase:1, year:'2026', title:'Protección Perimetral y Control de Acceso',
+    note:'Todos en paralelo — arrancan el mismo trimestre',
+    groups:[
+      {
+        parallel:true,
+        label:'Día 1 — arrancan juntos e inmediatamente',
+        items:[
+          {
+            num:1, id:'fw', name:'FW perimetral Zero Trust',
+            tags:[{t:'Crítico',cls:'os-tag-crit'}],
+            reason:'Sin visibilidad del tráfico no puedes operar nada más. Genera los logs base que alimentan toda la arquitectura. La red OT de CENTROSUR (SCADA/ICS) es el riesgo de mayor impacto operativo — no puede esperar.',
+            deps:[]
+          },
+          {
+            num:2, id:'obs', name:'Observabilidad de red',
+            tags:[{t:'Paralelo con FW',cls:'os-tag-par'},{t:'Pendiente definición',cls:'os-tag-warn'}],
+            reason:'Va desde el día 1 junto con el FW — no después. Sin dashboards activos desde el inicio no sabes si el firewall está funcionando bien ni si hay tráfico que no capturaste. La observabilidad no es un resultado de tener datos, es la herramienta que confirma que los datos son correctos.',
+            deps:['fw']
+          },
+          {
+            num:3, id:'ept', name:'Endpoints — EPP · EDR',
+            tags:[{t:'Paralelo',cls:'os-tag-par'}],
+            reason:'En paralelo con FW. El agente EPP genera la telemetría del dispositivo que NAC necesitará en Fase 2 para validar postura. Cuanto antes esté instalado, más datos de comportamiento base acumulas.',
+            deps:[]
+          },
+          {
+            num:4, id:'mail', name:'Correo electrónico',
+            tags:[{t:'Paralelo',cls:'os-tag-par'}],
+            reason:'Superficie activa desde el día 0 — no espera nada. Los 15 días de Learning Mode pueden correr en paralelo mientras el FW se configura. Sin esto, el vector #1 de intrusión queda abierto durante todo el tiempo que demora Fase 1.',
+            deps:[]
+          }
+        ]
+      },
+      {
+        parallel:false,
+        label:'Segundo trimestre — una vez que FW y Endpoints estén estables',
+        items:[
+          {
+            num:5, id:'ztna', name:'Acceso remoto — ZTNA + CASB',
+            tags:[{t:'Después de FW',cls:'os-tag-dep'}],
+            reason:'Requiere que el perímetro esté definido para saber qué aplicaciones exponer y qué no. El CASB integrado es además el prerrequisito técnico de la Protección de IA en Fase 3 — sin CASB operativo, esos controles son imposibles.',
+            deps:['fw','ept']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    phase:2, year:'2027', title:'Protección de la Identidad y Acceso a la Red',
+    note:'IAM primero — bloquea todo lo demás',
+    groups:[
+      {
+        parallel:false,
+        label:'Primero — sin esto nada de Fase 2 funciona',
+        items:[
+          {
+            num:6, id:'iam', name:'IAM / PAM',
+            tags:[{t:'Crítico',cls:'os-tag-crit'}],
+            reason:'NIST SP 800-207 es explícito: sin IAM maduro las decisiones Zero Trust son débiles. NAC necesita saber quién es el usuario. WAF necesita contexto de rol para sus reglas. La Protección de IA necesita saber qué usuario envía qué dato. Todo Fase 2 y parte de Fase 3 dependen de IAM.',
+            deps:['fw','ept']
+          }
+        ]
+      },
+      {
+        parallel:false,
+        label:'En paralelo una vez IAM está operativo',
+        items:[
+          {
+            num:7, id:'sdwan', name:'SD-WAN con seguridad integrada',
+            tags:[{t:'Resolver aquí',cls:'os-tag-warn'},{t:'Paralelo con IAM',cls:'os-tag-par'}],
+            reason:'Debe resolverse al inicio de Fase 2, no al final. Si CENTROSUR tiene subestaciones remotas sin conectividad segura, el FW perimetral de Fase 1 no las está cubriendo — hay un agujero de cobertura activo. Esto amplía el alcance de protección antes de endurecer identidad.',
+            deps:['fw']
+          },
+          {
+            num:8, id:'nac', name:'NAC · MFA',
+            tags:[{t:'Depende de IAM',cls:'os-tag-dep'},{t:'Paralelo con WAF',cls:'os-tag-par'}],
+            reason:'Una vez que IAM provee la identidad y el agente EPP provee el estado del dispositivo, NAC puede hacer segmentación dinámica real — no solo estática. En paralelo con WAF porque son consumidores independientes de IAM.',
+            deps:['fw','ept','iam']
+          },
+          {
+            num:9, id:'waf', name:'WAF · Protección de APIs',
+            tags:[{t:'Depende de IAM',cls:'os-tag-dep'},{t:'Paralelo con NAC',cls:'os-tag-par'}],
+            reason:'Con IAM operativo, las reglas del WAF pueden ser contextuales según el rol del usuario — esto reduce drásticamente los falsos positivos frente a un WAF sin contexto de identidad. En paralelo con NAC porque no se bloquean entre sí.',
+            deps:['fw','iam']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    phase:3, year:'2028', title:'Protección de Servicios y Gestión de Riesgos',
+    note:'Hardening antes de pentesting — siempre',
+    groups:[
+      {
+        parallel:false,
+        label:'Primero — endurecer antes de atacar',
+        items:[
+          {
+            num:10, id:'hardening', name:'Fortalecimiento de servicios y sistemas',
+            tags:[{t:'Primero en Fase 3',cls:'os-tag-crit'}],
+            reason:'Hardening va antes de pentesting — siempre. No tiene sentido contratar un ethical hacker para atacar sistemas que todavía tienen configuraciones inseguras por defecto. El hardening reduce el ruido: el pentesting posterior encuentra lo que realmente importa, no lo trivial.',
+            deps:['fw','ept','iam']
+          }
+        ]
+      },
+      {
+        parallel:true,
+        label:'En paralelo una vez que el hardening base está aplicado',
+        items:[
+          {
+            num:11, id:'vuln', name:'Vuln. Mgmt y Pentesting continuo',
+            tags:[{t:'Después de Hardening',cls:'os-tag-dep'}],
+            reason:'Con la línea base endurecida, el pentesting encuentra vulnerabilidades reales y no configuraciones básicas mal hechas. Los hallazgos alimentan directamente las reglas de detección del SIEM en Fase 4.',
+            deps:['fw','ept','iam','waf','hardening']
+          },
+          {
+            num:12, id:'aiprot', name:'Protección de la IA',
+            tags:[{t:'Paralelo con Pentesting',cls:'os-tag-par'},{t:'Pendiente definición',cls:'os-tag-warn'}],
+            reason:'CASB lleva operativo desde Fase 1 e IAM desde Fase 2 — en este punto ya tienes la madurez técnica para aplicar controles granulares sobre herramientas de IA. Pero requiere que CENTROSUR defina primero qué herramientas usan y qué datos considera sensibles.',
+            deps:['ztna','iam','nac']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    phase:4, year:'2029–2030', title:'Detección e Inteligencia de Amenazas',
+    note:'El orden aquí es estricto — cada capa alimenta a la siguiente',
+    groups:[
+      {
+        parallel:false,
+        label:'Primero — la plataforma de correlación',
+        items:[
+          {
+            num:13, id:'siem', name:'SIEM · SOAR · UEBA (IA)',
+            tags:[{t:'Crítico',cls:'os-tag-crit'}],
+            reason:'Requiere que Fases 1–3 estén generando logs limpios, normalizados y con contexto de identidad. Con esa base detecta patrones multi-vector imposibles de ver con herramientas individuales. Un SIEM implementado antes sobre red sin segmentar y sin identidades es puro ruido.',
+            deps:['fw','ept','mail','ztna','iam','waf']
+          }
+        ]
+      },
+      {
+        parallel:true,
+        label:'En paralelo una vez que SIEM recibe logs',
+        items:[
+          {
+            num:14, id:'ndr', name:'NDR',
+            tags:[{t:'Paralelo con SOC',cls:'os-tag-par'}],
+            reason:'Con la red segmentada (Fase 1) y NAC activo (Fase 2), NDR tiene contexto claro de cada zona y puede detectar movimientos laterales entre ellas. Se alimenta en SIEM para correlación unificada.',
+            deps:['fw','nac']
+          },
+          {
+            num:15, id:'soc', name:'SOC · CSIRT · CTI',
+            tags:[{t:'Último — opera sobre todo lo anterior',cls:'os-tag-dep'}],
+            reason:'El SOC es el último porque necesita que SIEM y NDR estén generando alertas de calidad. Sin esa base, el SOC opera con miles de alertas sin contexto — humanamente imposible. Con la plataforma XDR completa (FW + Endpoint + Correo + Acceso + SIEM + NDR), el SOC puede hacer Threat Hunting real y respuesta proactiva.',
+            deps:['siem','ndr']
+          }
+        ]
+      }
+    ]
+  }
+];
+
+function buildOrden(){
+  const wrap=document.getElementById('ordenContent');
+
+  // intro
+  const intro=document.createElement('div');
+  intro.className='orden-intro';
+  intro.innerHTML=`<strong>Criterio de ordenamiento:</strong> cada componente va donde va porque crea las condiciones técnicas para que el siguiente funcione bien — no por preferencia ni por costo. Los componentes en paralelo no tienen dependencia entre sí y pueden ejecutarse simultáneamente. El orden dentro de cada fase sí importa. <strong>Regla general:</strong> ninguna detección antes de tener protección · ninguna identidad antes de tener visibilidad · ningún pentesting antes de tener hardening.`;
+  wrap.appendChild(intro);
+
+  ORDEN.forEach(ph=>{
+    const block=document.createElement('div');
+    block.className='orden-phase-block';
+
+    const head=document.createElement('div');
+    head.className='orden-phase-head';
+    head.innerHTML=`
+      <div class="orden-phase-pill" style="color:${phC[ph.phase]};border-color:${phBD[ph.phase]};background:${phBG[ph.phase]}">Fase ${ph.phase}</div>
+      <div class="orden-phase-title" style="color:${phC[ph.phase]}">${ph.title}</div>
+      <span class="orden-phase-note">${ph.note}</span>
+      <div class="orden-phase-year">${ph.year}</div>`;
+    block.appendChild(head);
+
+    const stepsWrap=document.createElement('div');
+    stepsWrap.className='orden-steps';
+
+    ph.groups.forEach(group=>{
+      if(group.label){
+        const lbl=document.createElement('div');
+        lbl.className='par-label';
+        lbl.textContent=group.label;
+        stepsWrap.appendChild(lbl);
+      }
+      group.items.forEach(item=>{
+        const step=document.createElement('div');
+        step.className=`orden-step${group.parallel?' parallel':''}`;
+        const depsHtml=item.deps.length?`<div class="os-dep">Necesita: ${item.deps.map(d=>{const n=NODES.find(x=>x.id===d);return n?`<span class="os-dep-chip" style="color:${phC[n.phase]};border-color:${phBD[n.phase]};background:${phBG[n.phase]}">${n.name}</span>`:''}).join('')}</div>`:'';
+        const tagsHtml=item.tags.map(t=>`<span class="os-tag ${t.cls}">${t.t}</span>`).join('');
+        step.innerHTML=`
+          <div class="os-num" style="background:${phBG[ph.phase]};color:${phC[ph.phase]}">${item.num}</div>
+          <div class="os-body">
+            <div class="os-top">
+              <span class="os-name">${item.name}</span>
+              <div class="os-tags">${tagsHtml}</div>
+            </div>
+            <div class="os-reason">${item.reason}</div>
+            ${depsHtml}
+          </div>`;
+        stepsWrap.appendChild(step);
+      });
+    });
+
+    block.appendChild(stepsWrap);
+    wrap.appendChild(block);
+  });
+}
+
 buildMap();
 buildHitos();
+buildOrden();
 setTimeout(()=>drawConn(null),120);
 window.addEventListener('resize',()=>drawConn(selId));
 document.getElementById('board').addEventListener('scroll',()=>drawConn(selId));
