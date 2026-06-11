@@ -105,9 +105,11 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
 
 /* ── CONNECTOR SVG ── */
 @keyframes flow{to{stroke-dashoffset:-16}}
-.cp{fill:none;stroke-width:1.2;stroke-dasharray:4 4;opacity:.13;transition:opacity .18s,stroke-width .18s}
-.cp.act{opacity:.75;stroke-width:1.8;animation:flow .55s linear infinite}
-.cp.fad{opacity:.03}
+@keyframes flow-fwd{to{stroke-dashoffset:-20}}
+.cp{fill:none;stroke-width:1.2;stroke-dasharray:4 4;opacity:.12;transition:opacity .18s,stroke-width .18s}
+.cp.act-back{opacity:.82;stroke-width:2;stroke-dasharray:5 3;animation:flow .5s linear infinite}
+.cp.act-fwd{opacity:1;stroke-width:2.5;stroke-dasharray:7 3;animation:flow-fwd .4s linear infinite}
+.cp.fad{opacity:.025}
 
 /* ── SIDE PANEL ── */
 .panel{width:0;overflow:hidden;background:var(--bg1);border-left:1px solid var(--bd);transition:width .2s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;flex-shrink:0;z-index:50}
@@ -289,6 +291,22 @@ html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',
         <div class="col" id="col-4">
           <div class="ph-head h4"><div class="ph-num">Fase 4</div><div class="ph-name">Servicio de Detección e Inteligencia de Amenazas</div><div class="ph-year">2029–2030 · Operaciones proactivas</div></div>
         </div>
+      </div>
+      <!-- LEGEND -->
+      <div style="position:absolute;bottom:16px;left:16px;display:flex;align-items:center;gap:10px;background:var(--bg1);border:1px solid var(--bd2);border-radius:8px;padding:7px 12px;z-index:10;pointer-events:none">
+        <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t4)">Dependencias</span>
+        <div style="width:1px;height:14px;background:var(--bd2)"></div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <svg width="32" height="10" style="overflow:visible"><path d="M0,5 L28,5" fill="none" stroke="#e8a020" stroke-width="2" stroke-dasharray="5 3"/><path d="M22 2L28 5L22 8" fill="none" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:10px;color:var(--t3)">Requiere (desde fase anterior)</span>
+        </div>
+        <div style="width:1px;height:14px;background:var(--bd2)"></div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <svg width="32" height="10" style="overflow:visible"><path d="M0,5 L28,5" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="7 3"/><path d="M22 2L28 5L22 8" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span style="font-size:10px;color:var(--t3)">Habilita (hacia fase siguiente)</span>
+        </div>
+        <div style="width:1px;height:14px;background:var(--bd2)"></div>
+        <span style="font-size:10px;color:var(--t4);font-style:italic">Clic en un nodo para ver sus conexiones</span>
       </div>
     </div>
     <div class="panel" id="panel">
@@ -1026,19 +1044,69 @@ function drawConn(activeId){
   svg.setAttribute('width',board.scrollWidth);
   svg.setAttribute('height',board.scrollHeight);
   svg.innerHTML='';
+
+  // Build marker defs for each phase — two variants: back (origin color) and fwd (dest color)
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  [1,2,3,4].forEach(ph=>{
+    // back marker: origin phase color
+    ['back','fwd'].forEach(dir=>{
+      const color=phC[ph];
+      const m=document.createElementNS('http://www.w3.org/2000/svg','marker');
+      m.setAttribute('id',`arr-${dir}-${ph}`);
+      m.setAttribute('viewBox','0 0 10 10');
+      m.setAttribute('refX','9');m.setAttribute('refY','5');
+      m.setAttribute('markerWidth','6');m.setAttribute('markerHeight','6');
+      m.setAttribute('orient','auto-start-reverse');
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d','M2 2L8 5L2 8');
+      p.setAttribute('fill','none');
+      p.setAttribute('stroke',color);
+      p.setAttribute('stroke-width','1.5');
+      p.setAttribute('stroke-linecap','round');
+      p.setAttribute('stroke-linejoin','round');
+      m.appendChild(p);
+      defs.appendChild(m);
+    });
+  });
+  svg.appendChild(defs);
+
+  const activeNode = activeId ? NODES.find(x=>x.id===activeId) : null;
+  const activeDeps = activeNode ? activeNode.deps : [];
+  const activeTargets = activeNode ? NODES.filter(x=>x.deps.includes(activeId)).map(x=>x.id) : [];
+
   NODES.forEach(n=>{
     n.deps.forEach(depId=>{
       try{
         const f=getRect(depId),t=getRect(n.id);
+        const depNode=NODES.find(x=>x.id===depId);
         const x1=f.x+f.w-1,y1=f.cy,x2=t.x+1,y2=t.cy;
         const mx=(x1+x2)/2;
         const path=document.createElementNS('http://www.w3.org/2000/svg','path');
         path.setAttribute('d',`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
         path.setAttribute('class','cp');
-        path.setAttribute('stroke',phC[n.phase]);
-        if(activeId){
-          const act=(n.id===activeId||depId===activeId);
-          act?path.classList.add('act'):path.classList.add('fad');
+
+        if(!activeId){
+          // Default: use origin (dep) color, subtle
+          path.setAttribute('stroke',phC[depNode.phase]);
+          path.setAttribute('marker-end',`url(#arr-back-${depNode.phase})`);
+        } else {
+          const isBack = n.id===activeId && activeDeps.includes(depId);   // depId feeds INTO selected
+          const isFwd  = depId===activeId && activeTargets.includes(n.id); // selected feeds INTO n
+
+          if(isBack){
+            // Dependency coming IN to selected node — origin color
+            path.setAttribute('stroke',phC[depNode.phase]);
+            path.setAttribute('marker-end',`url(#arr-back-${depNode.phase})`);
+            path.classList.add('act-back');
+          } else if(isFwd){
+            // Selected node feeds FORWARD into n — destination color, brighter
+            path.setAttribute('stroke',phC[n.phase]);
+            path.setAttribute('marker-end',`url(#arr-fwd-${n.phase})`);
+            path.classList.add('act-fwd');
+          } else {
+            path.setAttribute('stroke',phC[depNode.phase]);
+            path.classList.add('fad');
+          }
         }
         svg.appendChild(path);
       }catch(e){}
