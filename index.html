@@ -1246,165 +1246,173 @@ document.querySelectorAll('.tab-btn').forEach(btn=>{
 // ══════════════════════
 // ORDEN DE IMPLEMENTACIÓN
 // ══════════════════════
+const ORDEN_DUMMY_START=true;
 const ORDEN=[
   {
     phase:1, year:'2026', title:'Protección Perimetral y Control de Acceso',
-    note:'Todos en paralelo — arrancan el mismo trimestre',
-    groups:[
-      {
-        parallel:true,
-        label:'Día 1 — arrancan juntos e inmediatamente',
-        items:[
-          {
-            num:1, id:'fw', name:'FW perimetral Zero Trust',
-            tags:[{t:'Crítico',cls:'os-tag-crit'}],
-            reason:'Sin visibilidad del tráfico no puedes operar nada más. Genera los logs base que alimentan toda la arquitectura. La red OT de CENTROSUR (SCADA/ICS) es el riesgo de mayor impacto operativo — no puede esperar.',
-            deps:[]
-          },
-          {
-            num:2, id:'obs', name:'Observabilidad de red',
-            tags:[{t:'Paralelo con FW',cls:'os-tag-par'},{t:'Pendiente definición',cls:'os-tag-warn'}],
-            reason:'Va desde el día 1 junto con el FW — no después. Sin dashboards activos desde el inicio no sabes si el firewall está funcionando bien ni si hay tráfico que no capturaste. La observabilidad no es un resultado de tener datos, es la herramienta que confirma que los datos son correctos.',
-            deps:['fw']
-          },
-          {
-            num:3, id:'ept', name:'Endpoints — EPP · EDR',
-            tags:[{t:'Paralelo',cls:'os-tag-par'}],
-            reason:'En paralelo con FW. El agente EPP genera la telemetría del dispositivo que NAC necesitará en Fase 2 para validar postura. Cuanto antes esté instalado, más datos de comportamiento base acumulas.',
-            deps:[]
-          },
-          {
-            num:4, id:'mail', name:'Correo electrónico',
-            tags:[{t:'Paralelo',cls:'os-tag-par'}],
-            reason:'Superficie activa desde el día 0 — no espera nada. Los 15 días de Learning Mode pueden correr en paralelo mientras el FW se configura. Sin esto, el vector #1 de intrusión queda abierto durante todo el tiempo que demora Fase 1.',
-            deps:[]
-          }
+    comps:[
+      { icon:'🔥', name:'FW Red de Usuarios', parallel:false,
+        steps:[
+          {num:'1.1',title:'Activación motores de inspección',note:'Primera configuración del NGFW: activar IPS, Anti-Bot, Sandboxing y CDR en la red de usuarios.',crit:true},
+          {num:'1.2',title:'Configuración Zero Trust inicial',note:'Reglas de auditoría para identificar aplicaciones y protocolos. Integración con AD/Azure AD.',crit:false},
+          {num:'1.3',title:'Filtros URL y DNS',note:'Anti-phishing, filtrado de URLs y seguridad del DNS. Paralelo con 1.4.',par:'1.4'},
+          {num:'1.4',title:'Política de menor privilegio',note:'Cerrar tráfico entrante por defecto. Exponer solo lo identificado en 1.2.',par:'1.3'},
+          {num:'1.5',title:'Microsegmentación por zonas',note:'Zonas DMZ, DB, App, Management. Capas de reglas + Identity Awareness + Threat Prevention estricto.',crit:false},
+          {num:'1.6',title:'Inspección HTTPS',note:'SSL gradual con despliegue de CA. Establecer excepciones justificadas.',crit:false},
+          {num:'1.7',title:'Integración Threat Intelligence',note:'Conectar con nube de inteligencia. Unificar logs. Alertas de fuerza bruta, Anti-Bot y exfiltración.',crit:false},
+          {num:'1.8',title:'Mantenimiento y operación',note:'Habilitar logs implícitos. Parches virtuales de aplicaciones recién vulneradas.',crit:false},
+          {num:'1.9',title:'Cumplimiento y ZT avanzado',note:'NIST CSF, reportes de eventos, Playblocks, asistente de seguridad IA.',crit:false}
         ]
       },
-      {
-        parallel:false,
-        label:'Segundo trimestre — una vez que FW y Endpoints estén estables',
-        items:[
-          {
-            num:5, id:'ztna', name:'Acceso remoto — ZTNA + CASB',
-            tags:[{t:'Después de FW',cls:'os-tag-dep'}],
-            reason:'Requiere que el perímetro esté definido para saber qué aplicaciones exponer y qué no. El CASB integrado es además el prerrequisito técnico de la Protección de IA en Fase 3 — sin CASB operativo, esos controles son imposibles.',
-            deps:['fw','ept']
-          }
+      { icon:'🏢', name:'FW Red de Datacenter', parallel:true,
+        steps:[
+          {num:'2.1',title:'Activación motores de inspección — DC',note:'FW + IPS + Anti-Bot para el datacenter. Paralelo con 1.1 y 3.1.',crit:true},
+          {num:'2.2',title:'Configuración Zero Trust — DC',note:'Auditoría de aplicaciones y protocolos del datacenter.',crit:false},
+          {num:'2.3',title:'Política de menor privilegio — DC',note:'Cerrar todo por defecto. Solo exponer lo identificado.',crit:false},
+          {num:'2.4',title:'Microsegmentación — DC',note:'Zonas DB, App, TI, Management. Inline Layers por aplicación.',crit:false},
+          {num:'2.5',title:'Inspección HTTPS — DC',note:'SSL gradual + excepciones para el datacenter.',crit:false},
+          {num:'2.6',title:'Integración Threat Intelligence — DC',note:'Logs unificados + alertas tempranas en DC.',crit:false},
+          {num:'2.7',title:'Mantenimiento y operación — DC',note:'Logs implícitos + parches virtuales en el datacenter.',crit:false}
+        ]
+      },
+      { icon:'⚙️', name:'FW Red de Operaciones (OT)', parallel:true,
+        steps:[
+          {num:'3.1',title:'Activación motores de inspección — OT',note:'IPS con perfil industrial (Modbus, DNP3, IEC 104). Paralelo con 1.1 y 2.1.',crit:true},
+          {num:'3.2',title:'Configuración Zero Trust — OT',note:'Auditoría de protocolos industriales de la red OT.',crit:false},
+          {num:'3.3',title:'Política de menor privilegio — OT',note:'Restricción estricta. La red OT no navega ni expone servicios genéricos.',crit:false},
+          {num:'3.4',title:'Microsegmentación OT · Purdue Model',note:'Zonas OT, App, Management. Separación física/lógica IT-OT. Threat Prevention estricto.',crit:true},
+          {num:'3.5',title:'Integración Threat Intelligence — OT',note:'Logs OT unificados. Alertas especializadas en amenazas industriales.',crit:false},
+          {num:'3.6',title:'Mantenimiento y operación — OT',note:'Logs implícitos + parches virtuales en red industrial.',crit:false},
+          {num:'3.7',title:'Logs OT para correlación XDR',note:'Integración de logs OT con el resto de la arquitectura para correlación en Fase 4.',crit:false}
+        ]
+      },
+      { icon:'💻', name:'Endpoints — EPP · EDR', parallel:true,
+        steps:[
+          {num:'4.1',title:'EPP Prevención de amenazas',note:'AV, Anti-Bot, Anti-Exploit, Anti-Ransomware, Sandboxing, CDR. Paralelo con 1.1.',crit:true,par:'4.2,4.3,4.4'},
+          {num:'4.2',title:'EPP Navegación segura',note:'Zero Phishing, URL Filtering, Safe Search.',par:'4.1'},
+          {num:'4.3',title:'EPP Control de acceso',note:'FW endpoint, App Control, controles Shadow IT.',par:'4.1'},
+          {num:'4.4',title:'EPP Protección de datos',note:'Cifrado completo de disco y medios extraíbles.',par:'4.1'},
+          {num:'4.5',title:'EDR Investigación y respuesta',note:'MITRE mapping, threat hunting, forense. Necesita 4.1-4.4 activos.',crit:false},
+          {num:'4.6',title:'Gestión de postura para ZT',note:'Vulnerability management + patch management. Habilita NAC en Fase 2.',crit:false,par:'4.7'},
+          {num:'4.7',title:'XDR en endpoint',note:'XDR integrado con logs de FW perimetral.',par:'4.6'},
+          {num:'4.8',title:'Inteligencia de amenazas',note:'Integración con nube de threat intelligence. Gestión de IoC. Playblocks.',crit:false},
+          {num:'4.9',title:'DLP en endpoint',note:'Canales: USB, portapapeles, impresión, correo. Clasificación de archivos.',crit:false,par:'4.10'},
+          {num:'4.10',title:'Monitoreo y operación activa',note:'Logs implícitos + validación de cumplimiento continuo.',par:'4.9'},
+          {num:'4.11',title:'ZTNA en FW perimetral ⚠',note:'⚠ Se ejecuta en FW pero depende de 5.3 (federación IdP). Se completa al terminar ZTNA en Fase 1.',warn:true}
+        ]
+      },
+      { icon:'✉️', name:'Correo electrónico', parallel:true,
+        steps:[
+          {num:'6.1',title:'Preparación y prerrequisitos',note:'Portal de ciberseguridad, M365 (Mail/SharePoint/OneDrive/Teams), consentimiento. Paralelo con 1.1.',crit:true},
+          {num:'6.2',title:'Learning Mode · 15 días',note:'Activar modo aprendizaje para establecer línea base antes de aplicar bloqueos.',crit:false},
+          {num:'6.3',title:'Implementación de políticas',note:'Regla inline + automatización Exchange.',crit:false},
+          {num:'6.4',title:'Políticas Zero Trust sobre correo',note:'CDR, Click-Time Protection, DMARC/DKIM/SPF, Zero Trust interno.',crit:false,par:'6.5'},
+          {num:'6.5',title:'DLP sobre correo',note:'Tipos de datos, OCR, cuarentena/justificar/aprobar, restricciones tenant.',par:'6.4'},
+          {num:'6.6',title:'Logs de correo para XDR',note:'Logs a la nube para correlación. Incidente unificado FW+Endpoint+Correo+Acceso.',crit:false}
+        ]
+      },
+      { icon:'📡', name:'Observabilidad de red', parallel:true,
+        steps:[
+          {num:'OBS.1',title:'Definir solución de observabilidad',note:'⚠ PENDIENTE. Decisión antes de arrancar: plataforma dedicada (Grafana, WhatsUp Gold) o consolidar en SIEM Fase 4.',warn:true},
+          {num:'OBS.2',title:'Despliegue de plataforma',note:'Dashboards de tráfico, latencia, errores. Correlación para detección temprana. Requiere que FW esté generando datos.',crit:false}
+        ]
+      },
+      { icon:'🔐', name:'Acceso remoto — ZTNA + CASB', parallel:false,
+        steps:[
+          {num:'5.1',title:'ZTNA · Despliegue cloud + App Connector HA',note:'Arranca cuando FW usuarios está estable (≥ hito 1.5). App Connector en alta disponibilidad.',crit:true},
+          {num:'5.2',title:'Modelo de acceso',note:'Definir acceso por cliente (agente) vs clientless para contratistas.',crit:false},
+          {num:'5.3',title:'Integración IdP + MFA + menor privilegio',note:'Federación de identidad exigiendo MFA. Políticas basadas en roles.',crit:false},
+          {num:'5.4',title:'Acceso unificado por tipo de usuario',note:'Empleados con agente del antivirus. Contratistas/terceros clientless.',crit:false},
+          {num:'5.5',title:'Migración gradual y apagado de VPN',note:'Piloto TI → apps críticas → migración total → apagado de VPN.',crit:false},
+          {num:'5.6',title:'CASB · Shadow IT + DLP SASE',note:'Descubrir Shadow IT, DLP en línea, sandboxing y CDR en acceso a internet. Prerrequisito de Protección IA (Fase 3).',crit:true},
+          {num:'5.7',title:'Logs SASE para XDR',note:'Correlación de 4 fuentes: FW + Endpoints + Correo + Acceso → un solo Incidente unificado.',crit:false}
         ]
       }
     ]
   },
   {
     phase:2, year:'2027', title:'Protección de la Identidad y Acceso a la Red',
-    note:'IAM primero — bloquea todo lo demás',
-    groups:[
-      {
-        parallel:false,
-        label:'Primero — sin esto nada de Fase 2 funciona',
-        items:[
-          {
-            num:6, id:'iam', name:'IAM / PAM',
-            tags:[{t:'Crítico',cls:'os-tag-crit'}],
-            reason:'NIST SP 800-207 es explícito: sin IAM maduro las decisiones Zero Trust son débiles. NAC necesita saber quién es el usuario. WAF necesita contexto de rol para sus reglas. La Protección de IA necesita saber qué usuario envía qué dato. Todo Fase 2 y parte de Fase 3 dependen de IAM.',
-            deps:['fw','ept']
-          }
+    comps:[
+      { icon:'🪪', name:'IAM / PAM', parallel:false,
+        steps:[
+          {num:'IAM.1',title:'Inventario y auditoría de identidades',note:'Inventario completo de cuentas. Detectar huérfanas y con exceso de permisos. Arranque obligatorio de Fase 2.',crit:true},
+          {num:'IAM.2',title:'MFA + federación IdP',note:'MFA obligatorio empezando por cuentas privilegiadas. Integración Azure AD / Entra ID. Prerrequisito de NAC y WAF.',crit:true},
+          {num:'IAM.3',title:'PAM · Acceso privilegiado',note:'Grabación y auditoría de sesiones privilegiadas. Just-In-Time access.',crit:false},
+          {num:'IAM.4',title:'Menor privilegio y revisiones periódicas',note:'Reducción de permisos excesivos. Proceso de revisión trimestral. Habilita NAC.1.',crit:false}
         ]
       },
-      {
-        parallel:false,
-        label:'En paralelo una vez IAM está operativo',
-        items:[
-          {
-            num:7, id:'sdwan', name:'SD-WAN con seguridad integrada',
-            tags:[{t:'Resolver aquí',cls:'os-tag-warn'},{t:'Paralelo con IAM',cls:'os-tag-par'}],
-            reason:'Debe resolverse al inicio de Fase 2, no al final. Si CENTROSUR tiene subestaciones remotas sin conectividad segura, el FW perimetral de Fase 1 no las está cubriendo — hay un agujero de cobertura activo. Esto amplía el alcance de protección antes de endurecer identidad.',
-            deps:['fw']
-          },
-          {
-            num:8, id:'nac', name:'NAC · MFA',
-            tags:[{t:'Depende de IAM',cls:'os-tag-dep'},{t:'Paralelo con WAF',cls:'os-tag-par'}],
-            reason:'Una vez que IAM provee la identidad y el agente EPP provee el estado del dispositivo, NAC puede hacer segmentación dinámica real — no solo estática. En paralelo con WAF porque son consumidores independientes de IAM.',
-            deps:['fw','ept','iam']
-          },
-          {
-            num:9, id:'waf', name:'WAF · Protección de APIs',
-            tags:[{t:'Depende de IAM',cls:'os-tag-dep'},{t:'Paralelo con NAC',cls:'os-tag-par'}],
-            reason:'Con IAM operativo, las reglas del WAF pueden ser contextuales según el rol del usuario — esto reduce drásticamente los falsos positivos frente a un WAF sin contexto de identidad. En paralelo con NAC porque no se bloquean entre sí.',
-            deps:['fw','iam']
-          }
+      { icon:'🗺️', name:'SD-WAN con seguridad integrada', parallel:true,
+        steps:[
+          {num:'SDWAN.1',title:'Levantamiento arquitectura WAN actual',note:'⚠ PENDIENTE. Inventario de sites remotos (subestaciones, oficinas). Paralelo con IAM.1.',warn:true},
+          {num:'SDWAN.2',title:'Evaluación y diseño de solución',note:'⚠ PENDIENTE. Evaluar capacidades SD-WAN del FW elegido. Definir scope de sites a cubrir.',warn:true}
+        ]
+      },
+      { icon:'🛡️', name:'NAC · MFA', parallel:false,
+        steps:[
+          {num:'NAC.1',title:'Políticas de cumplimiento de endpoint',note:'Definir requisitos: EPP activo, parches al día, cifrado habilitado. Necesita IAM.4 y 4.6.',crit:true,par:'7.1'},
+          {num:'NAC.2',title:'Segmentación dinámica',note:'Segmentación por rol y dispositivo. Red de cuarentena para equipos que no cumplen.',crit:false,par:'7.2'},
+          {num:'NAC.3',title:'Rollout por grupos',note:'TI primero → equipos críticos → resto de la organización. Contratistas via clientless.',crit:false,par:'7.3'}
+        ]
+      },
+      { icon:'🌐', name:'WAF · Protección de APIs', parallel:true,
+        steps:[
+          {num:'7.1',title:'Configuración + modo aprendizaje (7–14 días)',note:'Inventario de activos web/APIs. Learning Mode antes de cualquier bloqueo. Necesita IAM.2. Paralelo con NAC.1.',crit:true},
+          {num:'7.2',title:'Activación de protección y ajustes',note:'Calibración según madurez. Gestión de excepciones antes de activar prevención OWASP.',crit:false,par:'NAC.2'},
+          {num:'7.3',title:'Protección de APIs · API Gateway',note:'API Gateway + WAF sobre todas las APIs expuestas. Integración CI/CD DevSecOps.',crit:false,par:'NAC.3'},
+          {num:'7.4',title:'Logs WAF para XDR',note:'5ª fuente de correlación: FW + Endpoint + Correo + Acceso + WAF en un solo Incidente.',crit:false}
         ]
       }
     ]
   },
   {
     phase:3, year:'2028', title:'Protección de Servicios y Gestión de Riesgos',
-    note:'Hardening antes de pentesting — siempre',
-    groups:[
-      {
-        parallel:false,
-        label:'Primero — endurecer antes de atacar',
-        items:[
-          {
-            num:10, id:'hardening', name:'Fortalecimiento de servicios y sistemas',
-            tags:[{t:'Primero en Fase 3',cls:'os-tag-crit'}],
-            reason:'Hardening va antes de pentesting — siempre. No tiene sentido contratar un ethical hacker para atacar sistemas que todavía tienen configuraciones inseguras por defecto. El hardening reduce el ruido: el pentesting posterior encuentra lo que realmente importa, no lo trivial.',
-            deps:['fw','ept','iam']
-          }
+    comps:[
+      { icon:'🔩', name:'Fortalecimiento de servicios y sistemas', parallel:false,
+        steps:[
+          {num:'H.1',title:'Hardening CIS Benchmarks por tipo de sistema',note:'Aplicar guías CIS / DISA STIGs en SO, DB y aplicaciones. Va antes de pentesting — reduce ruido.',crit:true},
+          {num:'H.2',title:'Gestión de parches · SO y bases de datos',note:'Patch management con ventanas de mantenimiento. Validación de integridad post-parche.',crit:false,par:'H.3'},
+          {num:'H.3',title:'DLP perimetral y endpoint',note:'Monitoreo de flujos sensibles, clasificación de datos, políticas en tránsito/reposo/uso.',crit:false,par:'H.2'}
         ]
       },
-      {
-        parallel:true,
-        label:'En paralelo una vez que el hardening base está aplicado',
-        items:[
-          {
-            num:11, id:'vuln', name:'Vuln. Mgmt y Pentesting continuo',
-            tags:[{t:'Después de Hardening',cls:'os-tag-dep'}],
-            reason:'Con la línea base endurecida, el pentesting encuentra vulnerabilidades reales y no configuraciones básicas mal hechas. Los hallazgos alimentan directamente las reglas de detección del SIEM en Fase 4.',
-            deps:['fw','ept','iam','waf','hardening']
-          },
-          {
-            num:12, id:'aiprot', name:'Protección de la IA',
-            tags:[{t:'Paralelo con Pentesting',cls:'os-tag-par'},{t:'Pendiente definición',cls:'os-tag-warn'}],
-            reason:'CASB lleva operativo desde Fase 1 e IAM desde Fase 2 — en este punto ya tienes la madurez técnica para aplicar controles granulares sobre herramientas de IA. Pero requiere que CENTROSUR defina primero qué herramientas usan y qué datos considera sensibles.',
-            deps:['ztna','iam','nac']
-          }
+      { icon:'🔍', name:'Vuln. Mgmt y Pentesting continuo', parallel:false,
+        steps:[
+          {num:'V.1',title:'Escaneo inicial y línea base',note:'Escaneo automatizado de vulnerabilidades. Priorización por criticidad y exposición. Necesita H.1 completo.',crit:true},
+          {num:'V.4',title:'Pruebas de penetración periódicas',note:'Ethical hacking controlado, trimestral. Integración DevSecOps. Los hallazgos alimentan reglas SIEM en Fase 4.',crit:false}
+        ]
+      },
+      { icon:'🤖', name:'Protección de la IA', parallel:true,
+        steps:[
+          {num:'AI.1',title:'Inventario herramientas IA + clasificación datos',note:'⚠ PENDIENTE. Qué herramientas IA usa CENTROSUR. Qué datos son sensibles. Necesita CASB (5.6) e IAM.4.',warn:true},
+          {num:'AI.2',title:'Definir política de uso de IA',note:'⚠ PENDIENTE. ¿Bloqueo total? ¿parcial? ¿solo corporativo? ¿Copilot licenciado?',warn:true},
+          {num:'AI.3',title:'CASB + DLP sobre canales de IA',note:'DLP sobre ChatGPT/Copilot/Gemini via CASB. Restricción de tenants. Etiquetado de datos.',crit:false}
         ]
       }
     ]
   },
   {
-    phase:4, year:'2029–2030', title:'Detección e Inteligencia de Amenazas',
-    note:'El orden aquí es estricto — cada capa alimenta a la siguiente',
-    groups:[
-      {
-        parallel:false,
-        label:'Primero — la plataforma de correlación',
-        items:[
-          {
-            num:13, id:'siem', name:'SIEM · SOAR · UEBA (IA)',
-            tags:[{t:'Crítico',cls:'os-tag-crit'}],
-            reason:'Requiere que Fases 1–3 estén generando logs limpios, normalizados y con contexto de identidad. Con esa base detecta patrones multi-vector imposibles de ver con herramientas individuales. Un SIEM implementado antes sobre red sin segmentar y sin identidades es puro ruido.',
-            deps:['fw','ept','mail','ztna','iam','waf']
-          }
+    phase:4, year:'2029–2030', title:'Servicio de Detección e Inteligencia de Amenazas',
+    comps:[
+      { icon:'📊', name:'SIEM · SOAR · UEBA', parallel:false,
+        steps:[
+          {num:'S.1',title:'Integración de todas las fuentes de log',note:'Conectores: FW usuarios+DC+OT, Endpoints, Correo, ZTNA/SASE, IAM, WAF. Normalización y correlación.',crit:true},
+          {num:'S.2',title:'Reglas de detección MITRE ATT&CK',note:'Reglas para el sector energético. Dashboards de cumplimiento en tiempo real.',crit:false},
+          {num:'S.3',title:'SOAR · Playbooks de respuesta',note:'Automatización de contención para incidentes conocidos sin intervención humana.',crit:false,par:'NDR.1'},
+          {num:'S.4',title:'UEBA · Análisis de comportamiento con IA',note:'Detección de insider threat, exfiltración, escalación de privilegios, APT.',crit:false,par:'NDR.2'}
         ]
       },
-      {
-        parallel:true,
-        label:'En paralelo una vez que SIEM recibe logs',
-        items:[
-          {
-            num:14, id:'ndr', name:'NDR',
-            tags:[{t:'Paralelo con SOC',cls:'os-tag-par'}],
-            reason:'Con la red segmentada (Fase 1) y NAC activo (Fase 2), NDR tiene contexto claro de cada zona y puede detectar movimientos laterales entre ellas. Se alimenta en SIEM para correlación unificada.',
-            deps:['fw','nac']
-          },
-          {
-            num:15, id:'soc', name:'SOC · CSIRT · CTI',
-            tags:[{t:'Último — opera sobre todo lo anterior',cls:'os-tag-dep'}],
-            reason:'El SOC es el último porque necesita que SIEM y NDR estén generando alertas de calidad. Sin esa base, el SOC opera con miles de alertas sin contexto — humanamente imposible. Con la plataforma XDR completa (FW + Endpoint + Correo + Acceso + SIEM + NDR), el SOC puede hacer Threat Hunting real y respuesta proactiva.',
-            deps:['siem','ndr']
-          }
+      { icon:'📶', name:'NDR', parallel:true,
+        steps:[
+          {num:'NDR.1',title:'Despliegue de sensores NDR',note:'Sensores en puntos estratégicos para captura de tráfico este-oeste. Necesita microsegmentación (1.5) y NAC.2. Paralelo con S.3.',crit:true},
+          {num:'NDR.2',title:'Baseline y alertas de comportamiento anómalo',note:'Línea base de tráfico normal por zona. Alertas por comunicaciones inter-zona no autorizadas.',crit:false,par:'S.4'},
+          {num:'NDR.3',title:'Integración con SIEM',note:'NDR como fuente adicional en SIEM. Vista unificada FW+Endpoint+NDR+Identidad.',crit:false}
+        ]
+      },
+      { icon:'🎯', name:'SOC · CSIRT · CTI', parallel:false,
+        steps:[
+          {num:'SOC.1',title:'Estructura organizacional del SOC',note:'Modelo: interno / híbrido / MSSP. Roles Tier 1/2/3, Threat Hunter, CTI Analyst. Necesita SIEM+NDR estables.',crit:true},
+          {num:'SOC.2',title:'Procesos CSIRT · gestión de incidentes',note:'Detección → Análisis → Contención → Erradicación → Recuperación. Playbooks SOAR. Simulacros.',crit:false,par:'SOC.3'},
+          {num:'SOC.3',title:'CTI · Cyber Threat Intelligence',note:'Feeds especializados en sector eléctrico/OT. IoC en tiempo real en FW y SIEM. Reportes ejecutivos.',crit:false,par:'SOC.2'},
+          {num:'SOC.4',title:'Threat Hunting continuo',note:'Búsqueda proactiva de APTs que no activan alertas automáticas. Playblocks.',crit:false}
         ]
       }
     ]
@@ -1413,61 +1421,122 @@ const ORDEN=[
 
 function buildOrden(){
   const wrap=document.getElementById('ordenContent');
+  wrap.innerHTML='';
 
-  // intro
+  // INTRO
   const intro=document.createElement('div');
-  intro.className='orden-intro';
-  intro.innerHTML=`<strong>Criterio de ordenamiento:</strong> cada componente va donde va porque crea las condiciones técnicas para que el siguiente funcione bien — no por preferencia ni por costo. Los componentes en paralelo no tienen dependencia entre sí y pueden ejecutarse simultáneamente. El orden dentro de cada fase sí importa. <strong>Regla general:</strong> ninguna detección antes de tener protección · ninguna identidad antes de tener visibilidad · ningún pentesting antes de tener hardening.`;
+  intro.style.cssText='background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 18px;margin-bottom:28px;font-size:12px;color:var(--t2);line-height:1.65';
+  intro.innerHTML='<strong style="color:var(--t1)">Criterio:</strong> cada hito va donde va porque crea la condición técnica para que el siguiente funcione bien. <strong style="color:var(--t1)">Los hitos en paralelo (⇌)</strong> no tienen dependencia entre sí y pueden correr simultáneamente. <strong style="color:var(--t1)">Regla general:</strong> ninguna detección sin protección previa · ninguna identidad sin visibilidad · ningún pentesting sin hardening.';
   wrap.appendChild(intro);
 
-  ORDEN.forEach(ph=>{
-    const block=document.createElement('div');
-    block.className='orden-phase-block';
+  // PHASE TIMELINE STRIP
+  const strip=document.createElement('div');
+  strip.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:28px';
+  [1,2,3,4].forEach(ph=>{
+    const d=document.createElement('div');
+    d.style.cssText=`background:${phBG[ph]};border:1px solid ${phBD[ph]};border-radius:8px;padding:10px 14px;cursor:pointer;transition:opacity .15s`;
+    d.innerHTML=`<div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${phC[ph]};margin-bottom:2px">FASE ${ph} · ${PYEAR[ph]}</div><div style="font-size:11px;font-weight:600;color:${phC[ph]};opacity:.9;line-height:1.3">${['Protección Perimetral','Identidad y Acceso','Servicios y Riesgos','Detección e Inteligencia'][ph-1]}</div>`;
+    d.addEventListener('click',()=>{
+      document.getElementById(`phase-block-${ph}`).scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    strip.appendChild(d);
+  });
+  wrap.appendChild(strip);
 
-    const head=document.createElement('div');
-    head.className='orden-phase-head';
-    head.innerHTML=`
-      <div class="orden-phase-pill" style="color:${phC[ph.phase]};border-color:${phBD[ph.phase]};background:${phBG[ph.phase]}">Fase ${ph.phase}</div>
-      <div class="orden-phase-title" style="color:${phC[ph.phase]}">${ph.title}</div>
-      <span class="orden-phase-note">${ph.note}</span>
-      <div class="orden-phase-year">${ph.year}</div>`;
-    block.appendChild(head);
+  ORDEN.forEach((ph,phIdx)=>{
+    const phBlock=document.createElement('div');
+    phBlock.id=`phase-block-${ph.phase}`;
+    phBlock.style.cssText='margin-bottom:40px';
 
-    const stepsWrap=document.createElement('div');
-    stepsWrap.className='orden-steps';
+    // PHASE HEADER
+    const phHead=document.createElement('div');
+    phHead.style.cssText=`display:flex;align-items:center;gap:10px;padding:12px 18px;background:${phBG[ph.phase]};border:1px solid ${phBD[ph.phase]};border-radius:10px;margin-bottom:16px`;
+    phHead.innerHTML=`<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${phC[ph.phase]};padding:3px 10px;border-radius:20px;border:1px solid ${phBD[ph.phase]};background:${phBG[ph.phase]};flex-shrink:0">FASE ${ph.phase}</div><div style="font-size:13px;font-weight:600;color:${phC[ph.phase]};flex:1">${ph.title}</div><div style="font-size:10px;font-weight:500;color:${phC[ph.phase]};opacity:.6">${ph.year}</div>`;
+    phBlock.appendChild(phHead);
 
-    ph.groups.forEach(group=>{
-      if(group.label){
-        const lbl=document.createElement('div');
-        lbl.className='par-label';
-        lbl.textContent=group.label;
-        stepsWrap.appendChild(lbl);
-      }
-      group.items.forEach(item=>{
-        const step=document.createElement('div');
-        step.className=`orden-step${group.parallel?' parallel':''}`;
-        const depsHtml=item.deps.length?`<div class="os-dep">Necesita: ${item.deps.map(d=>{const n=NODES.find(x=>x.id===d);return n?`<span class="os-dep-chip" style="color:${phC[n.phase]};border-color:${phBD[n.phase]};background:${phBG[n.phase]}">${n.name}</span>`:''}).join('')}</div>`:'';
-        const tagsHtml=item.tags.map(t=>`<span class="os-tag ${t.cls}">${t.t}</span>`).join('');
-        step.innerHTML=`
-          <div class="os-num" style="background:${phBG[ph.phase]};color:${phC[ph.phase]}">${item.num}</div>
-          <div class="os-body">
-            <div class="os-top">
-              <span class="os-name">${item.name}</span>
-              <div class="os-tags">${tagsHtml}</div>
-            </div>
-            <div class="os-reason">${item.reason}</div>
-            ${depsHtml}
-          </div>`;
-        stepsWrap.appendChild(step);
+    // COMPONENTS
+    ph.comps.forEach((comp,compIdx)=>{
+      const compWrap=document.createElement('div');
+      compWrap.style.cssText='margin-bottom:12px';
+
+      // Component header
+      const compHead=document.createElement('div');
+      compHead.style.cssText=`display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg2);border:1px solid var(--bd2);border-radius:8px 8px 0 0;border-bottom:none`;
+      const parBadge=comp.parallel?`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.06);color:var(--t3);border:1px solid var(--bd2);text-transform:uppercase;letter-spacing:.05em">⇌ Paralelo con anterior</span>`:'';
+      compHead.innerHTML=`<span style="font-size:14px">${comp.icon}</span><span style="font-size:11px;font-weight:600;color:var(--t1);flex:1">${comp.name}</span>${parBadge}<span style="font-size:9px;color:var(--t4);font-weight:600">${comp.steps.length} hito${comp.steps.length!==1?'s':''}</span>`;
+      compWrap.appendChild(compHead);
+
+      // Steps table
+      const table=document.createElement('div');
+      table.style.cssText='border:1px solid var(--bd2);border-radius:0 0 8px 8px;overflow:hidden';
+
+      comp.steps.forEach((step,stepIdx)=>{
+        const row=document.createElement('div');
+        const isLast=stepIdx===comp.steps.length-1;
+        row.style.cssText=`display:grid;grid-template-columns:52px 1fr auto;gap:0;border-bottom:${isLast?'none':'1px solid var(--bd)'};background:${step.warn?'rgba(245,158,11,.04)':step.crit?'rgba(255,255,255,.015)':'var(--bg1)'};transition:background .12s`;
+        row.addEventListener('mouseenter',()=>row.style.background=step.warn?'rgba(245,158,11,.08)':'var(--bg3)');
+        row.addEventListener('mouseleave',()=>row.style.background=step.warn?'rgba(245,158,11,.04)':step.crit?'rgba(255,255,255,.015)':'var(--bg1)');
+
+        // Num cell
+        const numCell=document.createElement('div');
+        numCell.style.cssText=`display:flex;align-items:center;justify-content:center;padding:10px 8px;border-right:1px solid var(--bd);background:${phBG[ph.phase]};flex-direction:column;gap:2px`;
+        numCell.innerHTML=`<span style="font-size:9px;font-weight:700;color:${phC[ph.phase]};letter-spacing:.03em">${step.num}</span>`;
+        row.appendChild(numCell);
+
+        // Content cell
+        const contentCell=document.createElement('div');
+        contentCell.style.cssText='padding:9px 14px;display:flex;flex-direction:column;gap:3px;min-width:0';
+        const titleRow=document.createElement('div');
+        titleRow.style.cssText='display:flex;align-items:center;gap:6px;flex-wrap:wrap';
+
+        const titleEl=document.createElement('span');
+        titleEl.style.cssText='font-size:11px;font-weight:600;color:var(--t1)';
+        titleEl.textContent=step.title.replace(' ⚠','');
+        titleRow.appendChild(titleEl);
+
+        if(step.warn){const wb=document.createElement('span');wb.style.cssText='font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.25)';wb.textContent='! Pendiente definición';titleRow.appendChild(wb);}
+        if(step.crit){const cb=document.createElement('span');cb.style.cssText='font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)';cb.textContent='↑ Crítico';titleRow.appendChild(cb);}
+        if(step.par){const pb=document.createElement('span');pb.style.cssText=`font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--t3);border:1px solid var(--bd2)`;pb.textContent=`⇌ paralelo con ${step.par}`;titleRow.appendChild(pb);}
+
+        contentCell.appendChild(titleRow);
+        const noteEl=document.createElement('div');
+        noteEl.style.cssText='font-size:10px;color:var(--t3);line-height:1.5';
+        noteEl.textContent=step.note;
+        contentCell.appendChild(noteEl);
+        row.appendChild(contentCell);
+
+        // Step index
+        const idxCell=document.createElement('div');
+        idxCell.style.cssText=`display:flex;align-items:center;padding:0 14px;font-size:18px;color:var(--t4);border-left:1px solid var(--bd)`;
+        idxCell.textContent=String(stepIdx+1).padStart(2,'0');
+        idxCell.style.fontWeight='700';
+        idxCell.style.fontVariantNumeric='tabular-nums';
+        row.appendChild(idxCell);
+
+        table.appendChild(row);
       });
+
+      compWrap.appendChild(table);
+      phBlock.appendChild(compWrap);
     });
 
-    block.appendChild(stepsWrap);
-    wrap.appendChild(block);
+    wrap.appendChild(phBlock);
+
+    // Phase connector arrow (not for last)
+    if(phIdx < ORDEN.length-1){
+      const arrow=document.createElement('div');
+      arrow.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;margin-top:-14px';
+      arrow.innerHTML=`<div style="flex:1;height:1px;background:var(--bd)"></div><div style="font-size:11px;font-weight:600;color:var(--t4);padding:4px 12px;border:1px solid var(--bd);border-radius:20px;background:var(--bg1);white-space:nowrap">Fase ${ph.phase} completa → Fase ${ph.phase+1}</div><div style="flex:1;height:1px;background:var(--bd)"></div>`;
+      wrap.appendChild(arrow);
+    }
   });
 }
-
 buildMap();
+buildHitos();
+buildOrden();
+setTimeout(()=>drawConn(null),120);
+window.addEventListener('resize',()=>drawConn(selId));
+document.getElementById('board').addEventListener('scroll',()=>drawConn(selId));
 buildHitos();
 buildOrden();
 setTimeout(()=>drawConn(null),120);
