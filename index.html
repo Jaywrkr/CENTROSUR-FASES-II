@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CENTROSUR · Roadmap de Ciberseguridad</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#070b14;--bg1:#0d1321;--bg2:#111827;--bg3:#172032;--bg4:#1e2a3f;
+  --t1:#e8edf8;--t2:#8b9ec4;--t3:#4e5e7a;--t4:#2d3a52;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.12);--bd3:rgba(255,255,255,0.18);
+  --f1:#e8a020;--f1d:rgba(232,160,32,.1);--f1b:rgba(232,160,32,.22);
+  --f2:#3b82f6;--f2d:rgba(59,130,246,.1);--f2b:rgba(59,130,246,.22);
+  --f3:#22c55e;--f3d:rgba(34,197,94,.1);--f3b:rgba(34,197,94,.22);
+  --f4:#a855f7;--f4d:rgba(168,85,247,.1);--f4b:rgba(168,85,247,.22);
+  --warn:#f59e0b;--warnd:rgba(245,158,11,.1);
+  --ok:#22c55e;--red:#ef4444;
+}
+html,body{height:100%;background:var(--bg0);color:var(--t1);font-family:'Inter',system-ui,sans-serif;font-size:13px;overflow:hidden}
+
+/* ── TOPBAR ── */
+.topbar{height:52px;background:var(--bg1);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:200;position:relative;flex-shrink:0}
+.tb-brand{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.tb-title{font-size:12px;font-weight:500;color:var(--t1);flex:1}
+.tb-stats{display:flex;gap:4px}
+.spill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid;display:flex;align-items:center;gap:4px}
+.spill.tot{color:var(--t2);border-color:var(--bd2);background:var(--bg3)}
+.spill.ok{color:#4ade80;border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.07)}
+.spill.wn{color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.07)}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:1px;background:var(--bg1);border-bottom:1px solid var(--bd);padding:0 20px;flex-shrink:0}
+.tab-btn{padding:10px 16px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;user-select:none}
+.tab-btn:hover{color:var(--t2)}
+.tab-btn.active{color:var(--t1);border-bottom-color:var(--t1)}
+
+/* ── MAIN ── */
+.main{display:flex;height:calc(100vh - 88px);overflow:hidden}
+.tab-content{display:none;flex:1;overflow:hidden;min-height:0}
+.tab-content.active{display:flex}
+#tab-hitos{flex-direction:column;overflow:hidden}
+
+/* ══════════════════════════════════
+   TAB 1 — MAP
+══════════════════════════════════ */
+.board-wrap{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.board{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:0;overflow-y:auto;overflow-x:hidden;padding:14px 12px 60px;position:relative}
+.board::-webkit-scrollbar{width:3px}.board::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+.conn-layer{position:absolute;top:0;left:0;pointer-events:none;z-index:2}
+
+/* column */
+.col{display:flex;flex-direction:column;gap:6px;padding:0 6px;position:relative}
+
+/* phase header */
+.ph-head{position:sticky;top:0;z-index:20;padding:9px 11px;border-radius:8px;margin-bottom:2px;border:1px solid;backdrop-filter:blur(14px)}
+.ph-head.h1{background:rgba(232,160,32,.09);border-color:rgba(232,160,32,.18)}
+.ph-head.h2{background:rgba(59,130,246,.09);border-color:rgba(59,130,246,.18)}
+.ph-head.h3{background:rgba(34,197,94,.09);border-color:rgba(34,197,94,.18)}
+.ph-head.h4{background:rgba(168,85,247,.09);border-color:rgba(168,85,247,.18)}
+.ph-num{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:1px}
+.ph-name{font-size:11px;font-weight:600;line-height:1.25;margin-bottom:2px}
+.ph-year{font-size:9px;font-weight:500;opacity:.55;color:var(--t2)}
+.h1 .ph-num,.h1 .ph-name{color:var(--f1)}.h2 .ph-num,.h2 .ph-name{color:var(--f2)}
+.h3 .ph-num,.h3 .ph-name{color:var(--f3)}.h4 .ph-num,.h4 .ph-name{color:var(--f4)}
+
+/* node card — COMPACT */
+.nc{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;cursor:pointer;position:relative;transition:border-color .15s,background .15s,opacity .18s,transform .12s;border-left:2px solid transparent;user-select:none}
+.nc:hover{background:var(--bg3);transform:translateX(1px)}
+.nc.h1{border-left-color:var(--f1)}.nc.h2{border-left-color:var(--f2)}
+.nc.h3{border-left-color:var(--f3)}.nc.h4{border-left-color:var(--f4)}
+.nc.sel.h1{border-color:var(--f1);background:var(--f1d)}
+.nc.sel.h2{border-color:var(--f2);background:var(--f2d)}
+.nc.sel.h3{border-color:var(--f3);background:var(--f3d)}
+.nc.sel.h4{border-color:var(--f4);background:var(--f4d)}
+.nc.dep-hi{opacity:1!important}
+.nc.dim{opacity:.15}
+.nc.wc{border-left-color:var(--warn)!important}
+.nc.wc.sel{border-color:var(--warn)!important;background:var(--warnd)!important}
+
+.nc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:3px}
+.nc-name{font-size:11px;font-weight:600;color:var(--t1);line-height:1.3}
+.nc-sub{font-size:9px;color:var(--t3);margin-top:1px;line-height:1.3}
+.nc-icons{display:flex;gap:3px;flex-shrink:0;margin-top:1px}
+.ic{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px}
+.ic-warn{background:rgba(245,158,11,.2);color:var(--warn);border:1px solid rgba(245,158,11,.35)}
+.ic-client{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3);font-size:7px;font-weight:700}
+
+.nc-row{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.nc-bgs{display:flex;gap:2px;flex-wrap:wrap}
+.bg{font-size:8px;font-weight:700;letter-spacing:.04em;padding:1px 5px;border-radius:3px;text-transform:uppercase}
+.bg-ok{background:rgba(34,197,94,.14);color:#4ade80}
+.bg-wn{background:rgba(245,158,11,.14);color:#fbbf24}
+.bg-dp{background:rgba(255,255,255,.06);color:var(--t3)}
+.nc-dc{font-size:8px;color:var(--t4)}
+
+/* ── CONNECTOR SVG ── */
+@keyframes flow{to{stroke-dashoffset:-16}}
+.cp{fill:none;stroke-width:1.2;stroke-dasharray:4 4;opacity:.13;transition:opacity .18s,stroke-width .18s}
+.cp.act{opacity:.75;stroke-width:1.8;animation:flow .55s linear infinite}
+.cp.fad{opacity:.03}
+
+/* ── SIDE PANEL ── */
+.panel{width:0;overflow:hidden;background:var(--bg1);border-left:1px solid var(--bd);transition:width .2s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;flex-shrink:0;z-index:50}
+.panel.open{width:320px}
+.pi{width:320px;height:100%;overflow-y:auto;display:flex;flex-direction:column}
+.pi::-webkit-scrollbar{width:3px}.pi::-webkit-scrollbar-thumb{background:var(--bg4)}
+.p-bar{height:2px;width:100%;flex-shrink:0}
+.p-head{padding:16px 16px 12px;border-bottom:1px solid var(--bd);position:relative}
+.p-close{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:6px;background:var(--bg3);border:1px solid var(--bd2);color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:background .12s}
+.p-close:hover{background:var(--bg4);color:var(--t1)}
+.p-ph{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.p-title{font-size:14px;font-weight:600;color:var(--t1);line-height:1.3;padding-right:26px;margin-bottom:2px}
+.p-sub{font-size:10px;color:var(--t3)}
+.p-body{padding:14px 16px 28px;flex:1}
+.sec{margin-bottom:14px}
+.sec-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.sec-txt{font-size:11px;color:var(--t2);line-height:1.6}
+.warn-bx{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:7px;padding:10px 12px;margin-bottom:12px}
+.warn-bx-t{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:4px}
+.warn-bx-b{font-size:11px;color:rgba(245,158,11,.8);line-height:1.5}
+.act-bx{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:7px;padding:10px 12px;margin-top:4px}
+.act-bx-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#60a5fa;margin-bottom:5px}
+.act-i{font-size:11px;color:var(--t2);line-height:1.6;padding:2px 0;border-bottom:1px solid var(--bd)}
+.act-i:last-child{border-bottom:none}
+.act-i::before{content:'→ ';color:#60a5fa;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.chip{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;border:1px solid;cursor:pointer;transition:opacity .12s;text-transform:uppercase;letter-spacing:.04em}
+.chip:hover{opacity:.7}
+.empty-p{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center;gap:8px}
+.empty-p .ei{font-size:28px;opacity:.18}
+.empty-p .et{font-size:11px;color:var(--t3);line-height:1.6;max-width:220px}
+
+/* ══════════════════════════════════
+   TAB 2 — HITOS
+══════════════════════════════════ */
+/* ── HITOS LAYOUT ── */
+.hitos-layout{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* LEFT NAV */
+.phase-nav{width:196px;flex-shrink:0;background:var(--bg1);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;padding:14px 10px 20px}
+.phase-nav::-webkit-scrollbar{width:2px}
+.pnav-section{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);padding:10px 10px 6px}
+.pnav-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;user-select:none;transition:background .12s;border:1px solid transparent;margin-bottom:2px}
+.pnav-btn:hover{background:var(--bg3)}
+.pnav-btn.active{background:var(--bg3);border-color:var(--bd2)}
+.pnav-left{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.pnav-phase{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.pnav-name{font-size:10px;font-weight:500;color:var(--t3);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pnav-btn.active .pnav-name{color:var(--t2)}
+.pnav-cnt{font-size:9px;color:var(--t4);font-weight:600;flex-shrink:0}
+.pnav-divider{height:1px;background:var(--bd);margin:8px 2px 6px}
+
+/* COMPONENT NAV */
+.cnav-btn{display:flex;align-items:center;gap:7px;padding:6px 8px 6px 18px;border-radius:6px;cursor:pointer;user-select:none;transition:background .12s;margin-bottom:1px}
+.cnav-btn:hover{background:var(--bg3)}
+.cnav-btn.active{background:var(--bg3)}
+.cnav-icon{font-size:11px;flex-shrink:0}
+.cnav-name{font-size:10px;font-weight:500;color:var(--t3);flex:1;line-height:1.25}
+.cnav-btn.active .cnav-name{color:var(--t1);font-weight:600}
+.cnav-badge{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+/* MAIN CONTENT */
+.hitos-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.hitos-topbar{display:flex;align-items:center;gap:10px;padding:10px 20px;background:var(--bg1);border-bottom:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap}
+.htb-phase{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.htb-sep{color:var(--t4);font-size:12px}
+.htb-comp{font-size:12px;font-weight:600;color:var(--t1)}
+.htb-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.htb-count{font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;background:var(--bg3);color:var(--t2)}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3)}
+.leg-ic{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0}
+
+.hitos-scroll{flex:1;overflow-y:auto;padding:16px 20px 40px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.hitos-scroll::-webkit-scrollbar{width:3px}
+.hitos-scroll::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* component panel */
+.comp-panel{display:none;flex-direction:column;gap:8px}
+.comp-panel.active{display:flex}
+
+/* comp header banner */
+.comp-banner{border-radius:10px;padding:12px 16px;border:1px solid;display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.comp-banner-icon{font-size:18px}
+.comp-banner-name{font-size:13px;font-weight:600;flex:1}
+.comp-banner-badges{display:flex;gap:5px;flex-wrap:wrap}
+.cbadge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.03em}
+.cbadge-ok{background:rgba(34,197,94,.13);color:#4ade80}
+.cbadge-wn{background:rgba(245,158,11,.13);color:#fbbf24}
+.cbadge-cl{background:rgba(59,130,246,.13);color:#60a5fa}
+
+/* hito card */
+.hito{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:11px 13px;transition:border-color .12s}
+.hito:hover{border-color:var(--bd2)}
+.hito-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.hito-num{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em;flex-shrink:0;margin-top:1px}
+.hito-title{font-size:11px;font-weight:600;color:var(--t1);line-height:1.35;flex:1}
+.hito-tags{display:flex;gap:3px;flex-wrap:wrap;flex-shrink:0}
+.htag{font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
+.htag-cl{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.htag-tc{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
+.steps{display:flex;flex-direction:column;gap:3px;margin-left:26px}
+.step{font-size:10px;color:var(--t2);line-height:1.5;padding:2px 0;display:flex;align-items:flex-start;gap:6px}
+.step-dot{width:4px;height:4px;border-radius:50%;background:var(--t4);flex-shrink:0;margin-top:5px}
+.step-cl{color:#60a5fa}.step-cl .step-dot{background:#60a5fa}
+
+/* warn banner */
+.warn-comp-bx{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:8px;padding:10px 13px;margin-bottom:4px}
+.warn-comp-t{font-size:10px;font-weight:700;color:var(--warn);margin-bottom:4px}
+.warn-comp-b{font-size:11px;color:rgba(245,158,11,.8);line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand">Coresolutions</div>
+  <div class="tb-title">Fortalecimiento integral de la ciberseguridad · CENTROSUR · 2026–2030</div>
+  <div class="tb-stats">
+    <div class="spill tot"><span class="sdot"></span>12 componentes</div>
+    <div class="spill ok"><span class="sdot"></span>9 confirmados</div>
+    <div class="spill wn"><span class="sdot"></span>3 requieren definición</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab-btn active" data-tab="map">Mapa de dependencias</div>
+  <div class="tab-btn" data-tab="hitos">Plan por hitos</div>
+</div>
+
+<div class="main">
+
+  <!-- ═══ TAB 1: MAP ═══ -->
+  <div class="tab-content active" id="tab-map">
+    <div class="board-wrap">
+      <div class="board" id="board">
+        <svg class="conn-layer" id="connSvg" style="position:absolute;top:0;left:0;pointer-events:none;z-index:2;overflow:visible"></svg>
+        <div class="col" id="col-1">
+          <div class="ph-head h1"><div class="ph-num">Fase 1</div><div class="ph-name">Protección Perimetral y Control de Acceso</div><div class="ph-year">2026 · Fundación Zero Trust</div></div>
+        </div>
+        <div class="col" id="col-2">
+          <div class="ph-head h2"><div class="ph-num">Fase 2</div><div class="ph-name">Protección de la Identidad y Acceso a la Red</div><div class="ph-year">2027 · Identidad como perímetro</div></div>
+        </div>
+        <div class="col" id="col-3">
+          <div class="ph-head h3"><div class="ph-num">Fase 3</div><div class="ph-name">Protección de Servicios y Gestión de Riesgos</div><div class="ph-year">2028 · Reducción de superficie</div></div>
+        </div>
+        <div class="col" id="col-4">
+          <div class="ph-head h4"><div class="ph-num">Fase 4</div><div class="ph-name">Servicio de Detección e Inteligencia de Amenazas</div><div class="ph-year">2029–2030 · Operaciones proactivas</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" id="panel">
+      <div class="pi" id="pi">
+        <div class="empty-p"><div class="ei">◎</div><div class="et">Selecciona un componente para ver detalle completo, dependencias y relaciones.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 2: HITOS ═══ -->
+  <div class="tab-content" id="tab-hitos">
+    <div class="hitos-layout">
+      <!-- LEFT PHASE/COMPONENT NAV -->
+      <div class="phase-nav" id="phaseNav"></div>
+      <!-- MAIN SCROLLABLE CONTENT -->
+      <div class="hitos-main">
+        <div class="hitos-topbar" id="hitosTopbar">
+          <span class="htb-phase" id="htbPhase" style="color:var(--f1)">Fase 1</span>
+          <span class="htb-sep">›</span>
+          <span class="htb-comp" id="htbComp">—</span>
+          <div class="htb-right">
+            <div class="leg-item"><div class="leg-ic htag-cl" style="background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)">C</div>Cliente</div>
+            <div class="leg-item"><div class="leg-ic htag-tc" style="background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.2)">T</div>Técnico</div>
+            <div class="leg-item"><div class="leg-ic" style="background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)">!</div>Pendiente</div>
+            <div class="htb-count" id="htbCount">0 hitos</div>
+          </div>
+        </div>
+        <div class="hitos-scroll" id="hitosScroll"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PC={1:'#e8a020',2:'#3b82f6',3:'#22c55e',4:'#a855f7'};
+const PBG={1:'rgba(232,160,32,.1)',2:'rgba(59,130,246,.1)',3:'rgba(34,197,94,.1)',4:'rgba(168,85,247,.1)'};
+const PBD={1:'rgba(232,160,32,.28)',2:'rgba(59,130,246,.28)',3:'rgba(34,197,94,.28)',4:'rgba(168,85,247,.28)'};
+const PYEAR={1:'2026',2:'2027',3:'2028',4:'2029–2030'};
+const PNAME={1:'Protección Perimetral',2:'Identidad y Acceso',3:'Servicios y Riesgos',4:'Detección e Inteligencia'};
+
+// clientReq: true = el cliente lo pidió explícitamente (muestra icono C)
+const NODES=[
+  {id:'fw',phase:1,col:1,name:'FW perimetral Zero Trust',sub:'Usuarios · DC · OT · ISP',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:[],
+   what:'NGFW en los cuatro dominios de CENTROSUR: red de usuarios, datacenter, red OT e ISP. IPS con perfil industrial para OT, anti-bot, sandboxing, CDR y microsegmentación por zonas.',
+   why:'Primera línea de defensa. Sin visibilidad del tráfico no existe base para ninguna capa posterior. Para una distribuidora eléctrica, OT (SCADA/ICS) es el riesgo de mayor impacto operativo.',
+   goal:'Controlar todo el tráfico, microsegmentar zonas, activar inspección profunda y generar logs que alimentan la detección posterior.',
+   warn:'',actions:[]},
+  {id:'ept',phase:1,col:1,name:'Endpoints — EPP · EDR',sub:'Portátil · Escritorio · Servidores',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:[],
+   what:'EPP (antivirus, anti-exploit, anti-ransomware, sandboxing, CDR), EDR (threat hunting, MITRE mapping, forense), cifrado de disco, DLP en endpoint.',
+   why:'Vector de entrada más frecuente. Sin agente no hay telemetría del dispositivo — dato indispensable para NAC (Fase 2) y XDR (Fase 4).',
+   goal:'Detectar y contener amenazas en el dispositivo antes de propagación. Habilita ZTNA y DLP de canales de fuga.',
+   warn:'',actions:[]},
+  {id:'mail',phase:1,col:1,name:'Correo electrónico',sub:'Zero Trust · DMARC/DKIM/SPF',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:[],
+   what:'CDR sobre adjuntos, Click-Time Protection, validación DMARC/DKIM/SPF, monitoreo de movimiento lateral interno, DLP de correo, control de SharePoint/OneDrive/Teams.',
+   why:'Vector #1 de intrusión. Va en Fase 1 porque es superficie activa desde el día 0. Piloto en Learning Mode 15 días establece línea base.',
+   goal:'Eliminar la capacidad del correo de ser canal de entrada de malware o fuga de datos. Logs integrados en XDR (Fase 4).',
+   warn:'',actions:[]},
+  {id:'ztna',phase:1,col:1,name:'Acceso remoto — ZTNA + CASB',sub:'Reemplaza VPN · Shadow IT · DLP SASE',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:[],
+   what:'ZTNA basado en nube, reemplaza VPN. CASB para descubrir y controlar Shadow IT. DLP en línea sobre canales de internet. Sandboxing y CDR en acceso remoto.',
+   why:'VPN tradicional asume confianza una vez dentro. ZTNA verifica cada sesión. CASB es prerequisito para Protección de IA (Fase 3).',
+   goal:'Acceso seguro sin exponer red interna. Logs integrados como cuarto vector en XDR.',
+   warn:'',actions:[]},
+  {id:'obs',phase:1,col:1,name:'Observabilidad de red',sub:'Tráfico · Latencia · Anomalías',status:'warn',clientReq:true,
+   badges:['Requiere definición'],deps:[],
+   what:'El cliente especificó "Monitoreo, Detección y Observabilidad Integral de Red" como componente separado. Plataforma para monitorear tráfico, latencia, errores y comportamientos anómalos en tiempo real con dashboards operativos.',
+   why:'Distinto al SIEM de Fase 4: la observabilidad monitorea estado operativo de la infraestructura. Para CENTROSUR como distribuidora eléctrica, la disponibilidad de red es crítica operacionalmente — no solo como ciberseguridad.',
+   goal:'Visibilidad continua del estado de salud de la infraestructura. Detección temprana de degradación antes de que se convierta en incidente.',
+   warn:'No hay definición de solución. Hay que decidir entre: (A) plataforma dedicada (Grafana + Prometheus, Zabbix, WhatsUp Gold) o (B) consolidar en el SIEM de Fase 4 como módulo NPM. Esta decisión afecta el presupuesto y la arquitectura.',
+   actions:['Definir si va plataforma dedicada o se consolida en el SIEM de Fase 4','Si es dedicada: dimensionar y cotizar la solución (Grafana Stack, WhatsUp Gold, u otra)','Si se consolida: confirmar que el SIEM elegido incluya capacidades de NPM/observabilidad de red','Presentar opciones con análisis de costo-beneficio al cliente']},
+
+  {id:'iam',phase:2,col:2,name:'IAM / PAM',sub:'Identidades · Privilegios · MFA',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','ept'],
+   what:'Ciclo de vida completo de identidades, MFA con federación IdP, grabación y auditoría de sesiones privilegiadas, revisiones periódicas de permisos, principio de menor privilegio.',
+   why:'NIST SP 800-207: sin IAM maduro las decisiones Zero Trust son débiles. Requiere que los FW de Fase 1 ya hayan registrado qué aplicaciones usan los usuarios.',
+   goal:'Saber quién es cada usuario, qué puede hacer y auditar cada acción privilegiada. Habilita NAC, WAF contextual y Protección de IA (Fase 3).',
+   warn:'',actions:[]},
+  {id:'nac',phase:2,col:2,name:'NAC · MFA',sub:'Control de acceso · Postura del dispositivo',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','ept','iam'],
+   what:'NAC valida estado del endpoint antes de permitir acceso a red (EPP activo, parches, cifrado). MFA con IdP corporativo. Segmentación dinámica por dispositivo, usuario y rol.',
+   why:'Depende de EPP (Fase 1) para estado del endpoint e IAM (Fase 2) para identidad del usuario. Sin ambas, NAC solo hace segmentación estática básica.',
+   goal:'Solo dispositivos sanos e identidades verificadas acceden a la red. Dispositivos que no cumplen van a red de cuarentena.',
+   warn:'',actions:[]},
+  {id:'waf',phase:2,col:2,name:'WAF · Protección de APIs',sub:'OWASP Top 10 · API Gateway · DevSecOps',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','iam'],
+   what:'WAF para apps web (OWASP Top 10) con ML para detección de anomalías. Protección de APIs vía API Gateway + WAF. Integración con pipelines CI/CD para pruebas de seguridad automáticas en despliegues.',
+   why:'Con IAM operativo, las reglas de WAF pueden ser contextuales según el rol del usuario, reduciendo drásticamente los falsos positivos.',
+   goal:'Proteger servicios web y APIs contra ataques de capa 7. Logs de WAF integrados como quinto vector en XDR (Fase 4).',
+   warn:'',actions:[]},
+  {id:'sdwan',phase:2,col:2,name:'SD-WAN con seguridad integrada',sub:'Conectividad segura · Subestaciones · Sites',status:'warn',clientReq:true,
+   badges:['Requiere verificación'],deps:['fw'],
+   what:'El cliente mencionó "Seguridad de Aplicaciones (SDWAN)". Para CENTROSUR con múltiples subestaciones y puntos geográficos, SD-WAN con seguridad integrada permite conectividad segura entre sites con políticas Zero Trust por ubicación.',
+   why:'Si CENTROSUR tiene múltiples subestaciones o puntos remotos de operación, la conectividad segura entre sites es un componente crítico. Sin embargo, si ya tienen MPLS u otra solución, podría ser redundante.',
+   goal:'Conectividad segura y resiliente entre todos los sites de CENTROSUR con visibilidad y control centralizado del tráfico WAN.',
+   warn:'No está claro si CENTROSUR tiene múltiples sites geográficos, qué conectividad usan actualmente, y si el FW elegido ya incluye capacidades SD-WAN.',
+   actions:['Levantar inventario de sites remotos (subestaciones, oficinas regionales)','Evaluar si la solución de FW elegida incluye capacidades SD-WAN nativas','Determinar si el scope del proyecto incluye todos los sites o solo sede principal','Confirmar con el cliente antes de incluir o excluir del scope']},
+
+  {id:'aiprot',phase:3,col:3,name:'Protección de la IA',sub:'DLP sobre IA · CASB · Políticas',status:'warn',clientReq:true,
+   badges:['Requiere definición'],deps:['ztna','iam','nac'],
+   what:'Controles sobre herramientas de IA externas: DLP sobre canales de IA (ChatGPT, Copilot, Gemini), controles de inquilino corporativo vía CASB, políticas de qué datos pueden enviarse a modelos externos, clasificación y etiquetado.',
+   why:'Con CASB operativo (Fase 1) e IAM activo (Fase 2), es posible aplicar política granular sobre qué usuario puede enviar qué tipo de dato a qué IA. Sin esas bases, los controles de IA son imposibles de aplicar con granularidad.',
+   goal:'Evitar fuga de información confidencial de CENTROSUR (datos de clientes, planos de red eléctrica, contratos) a través de herramientas de IA externas.',
+   warn:'El cliente lo pidió pero no está definido qué herramientas de IA usa CENTROSUR, qué datos son sensibles en ese contexto y qué nivel de restricción quieren aplicar.',
+   actions:['Hacer inventario de qué herramientas de IA usa CENTROSUR actualmente','Clasificar qué tipos de datos considera CENTROSUR como sensibles o confidenciales','Definir política: ¿bloqueo total de IA externa? ¿solo con ciertos datos? ¿solo en dispositivos corporativos?','Confirmar si Microsoft Copilot está licenciado — el control se aplica dentro del tenant corporativo']},
+  {id:'vuln',phase:3,col:3,name:'Vuln. Mgmt y Pentesting continuo',sub:'Escaneo · Parches · Hardening CIS',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','ept','iam','waf'],
+   what:'Escaneo automatizado de vulnerabilidades, patch management de SO y bases de datos, hardening según CIS Benchmarks, pentesting periódico (ethical hacking controlado), integración DevSecOps.',
+   why:'Efectivo solo cuando ya tienes telemetría real (Fase 1) e identidades claras (Fase 2). Sin esa base, los resultados son parciales y la priorización incorrecta.',
+   goal:'Reducir activamente la superficie de ataque. Los hallazgos del pentesting alimentan reglas del SIEM en Fase 4.',
+   warn:'',actions:[]},
+  {id:'backup',phase:3,col:3,name:'Respaldos inmutables',sub:'Anti-ransomware · Cifrado en reposo',status:'ok',clientReq:false,
+   badges:['Confirmado'],deps:['fw','iam'],
+   what:'Backups inmutables que no pueden ser cifrados por un atacante. Cifrado de datos en reposo en servidores críticos. Política de retención 3-2-1-1, pruebas periódicas de restauración.',
+   why:'Ransomware es la amenaza de mayor impacto para infraestructura crítica latinoamericana. Los backups requieren que la red esté segmentada (Fase 1) para que el atacante no pueda alcanzarlos.',
+   goal:'Garantizar continuidad operativa ante un incidente de cifrado o destrucción masiva de datos.',
+   warn:'',actions:[]},
+
+  {id:'siem',phase:4,col:4,name:'SIEM · SOAR · UEBA (IA)',sub:'Correlación centralizada · Automatización · IA',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','ept','mail','ztna','iam','waf'],
+   what:'SIEM con SOAR y análisis de comportamiento con IA (UEBA). Correlación de logs de Fases 1–3: FW, Endpoint, Correo, Acceso Remoto, IAM y WAF. Reglas basadas en MITRE ATT&CK.',
+   why:'SIEM sin logs limpios genera miles de alertas sin utilidad. Requiere que Fases 1–3 estén generando telemetría normalizada y confiable. Con esa base detecta patrones que ninguna herramienta individual puede ver.',
+   goal:'Detectar ataques multi-vector. Automatizar respuesta (SOAR). Cumplimiento y auditoría para regulaciones del sector eléctrico ecuatoriano.',
+   warn:'',actions:[]},
+  {id:'ndr',phase:4,col:4,name:'NDR',sub:'Tráfico este-oeste · Movimiento lateral',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['fw','nac'],
+   what:'Network Detection and Response: monitorea tráfico interno (este-oeste) para detectar movimiento lateral, exfiltración lenta, APTs en progreso y anomalías entre zonas.',
+   why:'El FW perimetral ve tráfico norte-sur. NDR ve lo que pasa dentro — entre zonas segmentadas. Con microsegmentación activa (Fase 1) y NAC (Fase 2), NDR tiene visibilidad real de cada zona.',
+   goal:'Detectar un atacante dentro de la red moviéndose lateralmente antes de que llegue a sistemas OT o datos críticos.',
+   warn:'',actions:[]},
+  {id:'soc',phase:4,col:4,name:'SOC · CSIRT · CTI',sub:'Operaciones · Respuesta · Threat Intelligence',status:'ok',clientReq:true,
+   badges:['Confirmado'],deps:['siem','ndr'],
+   what:'SOC con roles y procesos definidos, CSIRT para gestión de incidentes (detección, análisis, contención, erradicación, recuperación), CTI con feeds del sector energético, Threat Hunting y Playbooks SOAR.',
+   why:'El SOC opera sobre la plataforma XDR unificada (FW + Endpoint + Correo + Acceso + SIEM). Sin esa base integrada, el SOC opera con demasiado ruido para ser efectivo.',
+   goal:'Capacidad proactiva de detección y respuesta. Reducir MTTD y MTTR. Threat Hunting continuo para APTs que no activan alertas automáticas.',
+   warn:'',actions:[]}
+];
+
+// ═══════════════════════════════════
+// HITOS DATA — técnico Coresolutions
+// ═══════════════════════════════════
+const HITOS_DATA=[
+  {
+    phaseId:1,compId:'fw',icon:'🔥',name:'FW perimetral Zero Trust',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'1.1',title:'Activación de motores de inspección',tags:['T'],steps:[
+        {t:'Firewall y control de aplicaciones en dominios usuarios/DC/OT/ISP',cl:false},
+        {t:'IPS con perfil de aplicaciones de usuarios (perfil industrial para OT)',cl:false},
+        {t:'Antivirus, Anti-Bot y Sandboxing',cl:false},
+        {t:'CDR — Desarmado y Reconstrucción de Contenidos',cl:false}
+      ]},
+      {num:'1.2',title:'Configuración Zero Trust inicial',tags:['T','C'],steps:[
+        {t:'Habilitar reglas de auditoría para identificar aplicaciones y protocolos usados',cl:false},
+        {t:'Identificación de usuarios contra fuentes de identidad (AD, Azure AD/Entra ID)',cl:true}
+      ]},
+      {num:'1.3',title:'Filtros de navegación y DNS',tags:['T'],steps:[
+        {t:'Filtros URL y Anti-Phishing',cl:false},
+        {t:'Seguridad del DNS',cl:false}
+      ]},
+      {num:'1.4',title:'Política de menor privilegio',tags:['T'],steps:[
+        {t:'Tráfico entrante: cerrar todo por defecto',cl:false},
+        {t:'Exponer solo aplicaciones y protocolos identificados en hito 1.2',cl:false},
+        {t:'Tráfico saliente con restricción en navegación y aplicaciones',cl:false},
+        {t:'Salida solo a protocolos permitidos: HTTP/HTTPS y DNS controlados',cl:false}
+      ]},
+      {num:'1.5',title:'Microsegmentación por zonas',tags:['T','C'],steps:[
+        {t:'Zonas: DMZ, DB, App, Management, OT',cl:true},
+        {t:'Capas de reglas: Top Section (infraestructura), Inline Layers (microseg.), Bottom Section (bloqueo implícito)',cl:false},
+        {t:'Identity Awareness para ZTNA',cl:false},
+        {t:'Application Control en DC y OT',cl:false},
+        {t:'Threat Prevention en modo Estricto',cl:false}
+      ]},
+      {num:'1.6',title:'Inspección HTTPS',tags:['T'],steps:[
+        {t:'Configurar inspección SSL gradualmente con despliegue de CA',cl:false},
+        {t:'Establecer excepciones justificadas a la inspección SSL',cl:false}
+      ]},
+      {num:'1.7',title:'Integración con Threat Intelligence',tags:['T'],steps:[
+        {t:'Integrar con nube de inteligencia de amenazas',cl:false},
+        {t:'Unificar logs en consola de gestión',cl:false},
+        {t:'Alertas tempranas: fuerza bruta, Anti-Bot, picos de tráfico saliente (posible exfiltración)',cl:false}
+      ]},
+      {num:'1.8',title:'Mantenimiento y operación',tags:['T'],steps:[
+        {t:'Habilitar reglas implícitas en registro de Logs',cl:false},
+        {t:'Parches virtuales de aplicaciones recién vulneradas',cl:false}
+      ]},
+      {num:'1.9',title:'Cumplimiento y Zero Trust avanzado',tags:['T','C'],steps:[
+        {t:'Cumplir normativa del sector (NIST CSF, IEC 62443 para OT)',cl:true},
+        {t:'Gestionar, analizar y generar informes sobre eventos',cl:true},
+        {t:'Acceso autenticado Zero Trust a través del proveedor de identidad',cl:false},
+        {t:'Playblocks: prevención colaborativa y automatizada de amenazas',cl:false},
+        {t:'Asistente de seguridad basado en IA',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'ept',icon:'💻',name:'Endpoints — EPP · EDR',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'4.1',title:'EPP — Prevención de amenazas',tags:['T','C'],steps:[
+        {t:'Antivirus, Anti-Bot, Anti-Exploit, Anti-Ransomware',cl:true},
+        {t:'Sandboxing para ataques de día cero',cl:false},
+        {t:'CDR — Desarmado y Reconstrucción de Contenidos',cl:false},
+        {t:'Protección de puertos y análisis de comportamiento',cl:false}
+      ]},
+      {num:'4.2',title:'EPP — Navegación segura',tags:['T'],steps:[
+        {t:'Zero Phishing y URL Filtering',cl:false},
+        {t:'Corporate Password Reuse y Safe Search',cl:false}
+      ]},
+      {num:'4.3',title:'EPP — Control de acceso en endpoint',tags:['T'],steps:[
+        {t:'Firewall y Application Control en endpoint',cl:false},
+        {t:'Controles de Shadow IT: bloquear Cloud Storage, Social Networking, Anonymizers',cl:false},
+        {t:'Endpoint Compliance y Remote Access VPN discrecional',cl:false}
+      ]},
+      {num:'4.4',title:'EPP — Protección de datos',tags:['T','C'],steps:[
+        {t:'Cifrado completo del disco',cl:true},
+        {t:'Cifrado de medios extraíbles',cl:false}
+      ]},
+      {num:'4.5',title:'EDR — Investigación y respuesta',tags:['T'],steps:[
+        {t:'Recopilación de pruebas forenses e informes automatizados',cl:false},
+        {t:'MITRE ATT&CK Mapping',cl:false},
+        {t:'Threat Hunting',cl:false}
+      ]},
+      {num:'4.6',title:'Gestión de postura para Zero Trust',tags:['T'],steps:[
+        {t:'Vulnerability Management y Patch Management',cl:false},
+        {t:'Integración con ZTNA para verificación de postura',cl:false}
+      ]},
+      {num:'4.7',title:'XDR en endpoint',tags:['T'],steps:[
+        {t:'XDR en el punto final',cl:false},
+        {t:'XDR integrado con logs de los Firewalls',cl:false}
+      ]},
+      {num:'4.8',title:'Inteligencia de amenazas',tags:['T'],steps:[
+        {t:'Integrar con nube de inteligencia de amenazas',cl:false},
+        {t:'Gestión de IoC',cl:false},
+        {t:'Playblocks: prevención colaborativa y automatizada',cl:false}
+      ]},
+      {num:'4.9',title:'DLP en endpoint',tags:['T','C'],steps:[
+        {t:'Alineación con tipos de datos predefinidos',cl:true},
+        {t:'Expresiones regulares, plantillas, clasificación de archivos, huellas digitales',cl:false},
+        {t:'Canales de fuga: almacenamiento extraíble, portapapeles, impresión, correo electrónico',cl:true},
+        {t:'Definición de acciones de respuesta',cl:false}
+      ]},
+      {num:'4.10',title:'Monitoreo y operación activa',tags:['T'],steps:[
+        {t:'Habilitar reglas implícitas en registro de Logs',cl:false},
+        {t:'Revisar para validar cumplimiento continuo',cl:false}
+      ]},
+      {num:'4.11',title:'Configuración ZTNA en Firewall perimetral',tags:['T'],steps:[
+        {t:'Identidad de usuario en lugar de IP',cl:false},
+        {t:'Verificación de postura en tiempo real',cl:false},
+        {t:'Reglas de acceso temáticas por usuario/rol',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'mail',icon:'✉️',name:'Correo electrónico',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'6.1',title:'Preparación y prerrequisitos',tags:['T'],steps:[
+        {t:'Preparación del portal que brinda la capa de ciberseguridad',cl:false},
+        {t:'Configuración del proveedor: Mail, SharePoint, OneDrive, Teams',cl:false},
+        {t:'Consentimiento de la aplicación en Microsoft 365',cl:false},
+        {t:'Definición del alcance inicial: Modo piloto → Modo producción',cl:false}
+      ]},
+      {num:'6.2',title:'Instalación y activación inicial',tags:['T'],steps:[
+        {t:'Implementación y activación de política',cl:false},
+        {t:'Learning Mode durante 15 días para establecer línea base',cl:false}
+      ]},
+      {num:'6.3',title:'Implementación de políticas',tags:['T'],steps:[
+        {t:'Configuración de Regla en Línea',cl:false},
+        {t:'Automatización de Reglas de Flujo en Exchange',cl:false}
+      ]},
+      {num:'6.4',title:'Políticas Zero Trust sobre correo',tags:['T','C'],steps:[
+        {t:'CDR sobre todos los adjuntos entrantes',cl:false},
+        {t:'Click-Time Protection: desconfianza absoluta de enlaces',cl:false},
+        {t:'Verificación de identidad del remitente: DMARC, DKIM, SPF',cl:true},
+        {t:'Zero Trust Interno: monitoreo de movimiento lateral',cl:false},
+        {t:'Anti-Phishing avanzado como primer eslabón ZTNA',cl:true},
+        {t:'Integración de respuesta automatizada',cl:false}
+      ]},
+      {num:'6.5',title:'DLP sobre correo',tags:['T','C'],steps:[
+        {t:'Política DLP: homologación con categorías predefinidas de tipos de datos',cl:true},
+        {t:'Sensores OCR para reconocimiento óptico de caracteres',cl:false},
+        {t:'Acciones: Cuarentena, Justificar, Aprobado',cl:false},
+        {t:'Restricciones para compartir archivos del tenant corporativo: OneDrive, SharePoint',cl:false}
+      ]},
+      {num:'6.6',title:'Logs de correo para XDR',tags:['T'],steps:[
+        {t:'Configuración para compartir Logs a la nube para correlación',cl:false},
+        {t:'Correlación unificada: FW + Endpoints + Correo + Acceso remoto → un único Incidente',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'ztna',icon:'🔐',name:'Acceso remoto — ZTNA + CASB',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'5.1',title:'ZTNA basado en la nube',tags:['T','C'],steps:[
+        {t:'Instalación del App Connector en HA',cl:false},
+        {t:'Integración del conector con la nube',cl:false},
+        {t:'Inventario de activos: App Web, App de Cliente, Apps legadas, SSH/RDP',cl:true},
+        {t:'Definición de flujos: quién necesita qué activo',cl:false}
+      ]},
+      {num:'5.2',title:'Modelo de acceso',tags:['T'],steps:[
+        {t:'Acceso basado en cliente (agente instalado)',cl:false},
+        {t:'Accesos clientless para contratistas y terceros',cl:false}
+      ]},
+      {num:'5.3',title:'Integración de identidad y menor privilegio',tags:['T'],steps:[
+        {t:'Federación de Identidad con el IdP, exigiendo MFA',cl:false},
+        {t:'Configuración de políticas basadas en roles',cl:false}
+      ]},
+      {num:'5.4',title:'Acceso unificado por tipo de usuario',tags:['T'],steps:[
+        {t:'Acceso a empleados unificado con el agente del antivirus',cl:false},
+        {t:'Acceso a contratistas/terceros: clientless',cl:false}
+      ]},
+      {num:'5.5',title:'Adopción gradual — migración desde VPN',tags:['T'],steps:[
+        {t:'Fase 1: Piloto con equipo TI',cl:false},
+        {t:'Fase 2: Aplicaciones web críticas',cl:false},
+        {t:'Fase 3: Migración total y apagado de la VPN',cl:false}
+      ]},
+      {num:'5.6',title:'CASB — Control de Shadow IT y DLP SASE',tags:['T','C'],steps:[
+        {t:'Descubrimiento y auditoría de Shadow IT en el acceso a internet',cl:true},
+        {t:'Controles de acceso granular a aplicaciones permitidas basadas en identidad',cl:false},
+        {t:'Restricción de inquilinos para forzar uso de tenants corporativos',cl:false},
+        {t:'DLP en línea por canales de fuga accesibles por internet',cl:true},
+        {t:'Protección contra amenazas avanzadas: Sandboxing y CDR',cl:false}
+      ]},
+      {num:'5.7',title:'Logs de SASE para XDR',tags:['T'],steps:[
+        {t:'Configuración para compartir Logs a la nube',cl:false},
+        {t:'Correlación de cuatro fuentes (FW, Endpoints, Correo, Acceso remoto) en un único Incidente unificado',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:1,compId:'obs',icon:'📡',name:'Observabilidad de red',
+    clientReq:true,status:'warn',
+    hitos:[
+      {num:'OBS.1',title:'Definir solución de observabilidad',tags:['C'],steps:[
+        {t:'PENDIENTE: Decidir entre plataforma dedicada o consolidar en SIEM de Fase 4',cl:true},
+        {t:'Opción A: Grafana + Prometheus, Zabbix, WhatsUp Gold',cl:false},
+        {t:'Opción B: Módulo NPM/observabilidad dentro del SIEM elegido',cl:false}
+      ]},
+      {num:'OBS.2',title:'Despliegue de herramientas de observabilidad',tags:['C'],steps:[
+        {t:'Despliegue de herramientas de observabilidad de red y seguridad',cl:true},
+        {t:'Creación de dashboards de tráfico, latencia, errores y comportamientos anómalos',cl:true},
+        {t:'Correlación de eventos para detección temprana de amenazas',cl:true}
+      ]}
+    ]
+  },
+
+  {
+    phaseId:2,compId:'iam',icon:'🪪',name:'IAM / PAM',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'IAM.1',title:'Inventario y auditoría de identidades',tags:['C'],steps:[
+        {t:'Inventario completo de cuentas (usuarios, servicios, privilegiadas)',cl:true},
+        {t:'Identificación de cuentas huérfanas o con exceso de permisos',cl:false}
+      ]},
+      {num:'IAM.2',title:'Despliegue de MFA y federación IdP',tags:['C','T'],steps:[
+        {t:'Integración con IdP existente (Azure AD/Entra ID u otro)',cl:true},
+        {t:'MFA obligatorio para todos los usuarios, comenzando por privilegiados',cl:true},
+        {t:'Federación de identidad con ZTNA, NAC y WAF',cl:false}
+      ]},
+      {num:'IAM.3',title:'PAM — Acceso privilegiado',tags:['C'],steps:[
+        {t:'Despliegue de PAM para todas las cuentas de administradores',cl:true},
+        {t:'Grabación y auditoría de sesiones privilegiadas',cl:true},
+        {t:'Just-In-Time access: permisos temporales solo cuando se necesitan',cl:false}
+      ]},
+      {num:'IAM.4',title:'Menor privilegio y revisiones periódicas',tags:['C'],steps:[
+        {t:'Revisión y reducción de permisos excesivos existentes',cl:true},
+        {t:'Proceso de revisión trimestral de permisos',cl:false},
+        {t:'Provisión y desprovisión automatizada de cuentas',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:2,compId:'nac',icon:'🛡️',name:'NAC · MFA',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'NAC.1',title:'Definición de políticas de cumplimiento de endpoint',tags:['C','T'],steps:[
+        {t:'Definir requisitos mínimos: EPP activo, parches al día, cifrado habilitado',cl:true},
+        {t:'Validación de cumplimiento antes de permitir acceso',cl:false}
+      ]},
+      {num:'NAC.2',title:'Segmentación dinámica',tags:['T'],steps:[
+        {t:'Segmentación por tipo de dispositivo, usuario y rol',cl:false},
+        {t:'Red de cuarentena para dispositivos que no cumplen',cl:false},
+        {t:'Integración con IAM para decisiones basadas en contexto',cl:false}
+      ]},
+      {num:'NAC.3',title:'Rollout por grupos',tags:['T'],steps:[
+        {t:'Piloto: equipo TI y equipos críticos',cl:false},
+        {t:'Despliegue: resto de la organización',cl:false},
+        {t:'Acceso para dispositivos no gestionados (contratistas): clientless',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:2,compId:'waf',icon:'🌐',name:'WAF · Protección de APIs',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'7.1',title:'Configuración inicial y modo aprendizaje',tags:['T','C'],steps:[
+        {t:'Configuración del activo web en la consola de gestión',cl:true},
+        {t:'Modo aprendizaje 7–14 días para establecer línea base de operación',cl:false},
+        {t:'Despliegue del agente vinculando token o cambios de MX',cl:false}
+      ]},
+      {num:'7.2',title:'Activación de protección y ajustes',tags:['T'],steps:[
+        {t:'Calibración según indicador de madurez',cl:false},
+        {t:'Gestión de excepciones antes de activar prevención',cl:false},
+        {t:'Activación del módulo de prevención (OWASP Top 10)',cl:false}
+      ]},
+      {num:'7.3',title:'Protección de APIs',tags:['T','C'],steps:[
+        {t:'API Gateway + WAF para todas las APIs expuestas',cl:true},
+        {t:'Integración con CI/CD para pruebas de seguridad en despliegues (DevSecOps)',cl:false}
+      ]},
+      {num:'7.4',title:'Logs del WAF para XDR',tags:['T'],steps:[
+        {t:'Configuración para compartir Logs a la nube para correlación',cl:false},
+        {t:'Correlación de cinco fuentes incluyendo WAF en un único Incidente unificado',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:2,compId:'sdwan',icon:'🗺️',name:'SD-WAN con seguridad integrada',
+    clientReq:true,status:'warn',
+    hitos:[
+      {num:'SDWAN.1',title:'Levantamiento de arquitectura WAN actual',tags:['C'],steps:[
+        {t:'PENDIENTE: Inventario de sites remotos de CENTROSUR (subestaciones, oficinas)',cl:true},
+        {t:'Documentar conectividad WAN actual: MPLS, Internet, fibra dedicada',cl:false}
+      ]},
+      {num:'SDWAN.2',title:'Evaluación y diseño de solución',tags:['C'],steps:[
+        {t:'Evaluar si el FW elegido incluye capacidades SD-WAN nativas',cl:false},
+        {t:'Determinar scope: ¿todos los sites o solo sede principal?',cl:true},
+        {t:'Diseñar conectividad segura con políticas Zero Trust por site',cl:false}
+      ]}
+    ]
+  },
+
+  {
+    phaseId:3,compId:'aiprot',icon:'🤖',name:'Protección de la IA',
+    clientReq:true,status:'warn',
+    hitos:[
+      {num:'AI.1',title:'Inventario y clasificación de herramientas IA',tags:['C'],steps:[
+        {t:'PENDIENTE: Inventario de herramientas IA que usa CENTROSUR (Copilot, ChatGPT, etc.)',cl:true},
+        {t:'Clasificación de datos sensibles: datos de clientes, planos, contratos operativos',cl:true}
+      ]},
+      {num:'AI.2',title:'Definición de política de uso de IA',tags:['C'],steps:[
+        {t:'PENDIENTE: Definir nivel de restricción: ¿bloqueo total? ¿parcial? ¿solo corporativo?',cl:true},
+        {t:'Confirmar si Microsoft Copilot está licenciado para controles en tenant corporativo',cl:false}
+      ]},
+      {num:'AI.3',title:'Implementación de controles CASB + DLP sobre IA',tags:['C','T'],steps:[
+        {t:'DLP sobre canales de IA (ChatGPT, Copilot, Gemini) via CASB',cl:true},
+        {t:'Restricción de inquilinos para forzar uso de tenants corporativos',cl:false},
+        {t:'Etiquetado y clasificación de datos sensibles',cl:true},
+        {t:'Monitoreo y auditoría de qué datos entran a herramientas IA',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:3,compId:'vuln',icon:'🔍',name:'Vuln. Mgmt y Pentesting continuo',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'V.1',title:'Escaneo inicial y línea base',tags:['T','C'],steps:[
+        {t:'Escaneo automatizado de vulnerabilidades en aplicaciones y servicios expuestos',cl:true},
+        {t:'Priorización por criticidad y exposición',cl:false}
+      ]},
+      {num:'V.2',title:'Programa de gestión de parches',tags:['T','C'],steps:[
+        {t:'Patch management de SO y bases de datos',cl:true},
+        {t:'Ventanas de mantenimiento sin afectar disponibilidad operativa',cl:false},
+        {t:'Validación de configuración segura post-parche',cl:false}
+      ]},
+      {num:'V.3',title:'Hardening de sistemas',tags:['T'],steps:[
+        {t:'Aplicación de guías CIS Benchmarks o DISA STIGs por tipo de sistema',cl:false},
+        {t:'Actualizaciones y validación de configuración segura',cl:false}
+      ]},
+      {num:'V.4',title:'Pruebas de penetración periódicas',tags:['T','C'],steps:[
+        {t:'Pentesting trimestral: ethical hacking controlado',cl:true},
+        {t:'Integración con pipelines DevSecOps',cl:false},
+        {t:'Reporte ejecutivo de hallazgos con plan de remediación',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:3,compId:'backup',icon:'💾',name:'Respaldos inmutables',
+    clientReq:false,status:'ok',
+    hitos:[
+      {num:'B.1',title:'Inventario y clasificación de datos críticos',tags:['T'],steps:[
+        {t:'Inventario de datos críticos de CENTROSUR',cl:false},
+        {t:'Clasificación: operacional, clientes, infraestructura, contratos',cl:false}
+      ]},
+      {num:'B.2',title:'Arquitectura de respaldo 3-2-1-1',tags:['T'],steps:[
+        {t:'3 copias, 2 medios distintos, 1 offsite, 1 inmutable (air-gapped)',cl:false},
+        {t:'Cifrado en reposo de datos sensibles',cl:false}
+      ]},
+      {num:'B.3',title:'Pruebas y validación',tags:['T'],steps:[
+        {t:'Pruebas de restauración mensuales obligatorias',cl:false},
+        {t:'Simulacro de ataque ransomware y recuperación',cl:false}
+      ]}
+    ]
+  },
+
+  {
+    phaseId:4,compId:'siem',icon:'📊',name:'SIEM · SOAR · UEBA (IA)',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'S.1',title:'Integración de todas las fuentes de log',tags:['T','C'],steps:[
+        {t:'Conectores: FW usuarios, FW DC, FW OT, Endpoints, Correo, ZTNA/SASE, IAM, WAF',cl:true},
+        {t:'Normalización y correlación de logs',cl:false}
+      ]},
+      {num:'S.2',title:'Reglas de detección MITRE ATT&CK',tags:['T','C'],steps:[
+        {t:'Reglas de alerta basadas en MITRE ATT&CK para el sector energético',cl:true},
+        {t:'Dashboards de cumplimiento y monitoreo en tiempo real',cl:true}
+      ]},
+      {num:'S.3',title:'SOAR — Automatización de respuesta',tags:['T'],steps:[
+        {t:'Playbooks de respuesta para incidentes conocidos',cl:false},
+        {t:'Contención automatizada sin intervención humana en casos definidos',cl:false}
+      ]},
+      {num:'S.4',title:'UEBA — Análisis de comportamiento con IA',tags:['T','C'],steps:[
+        {t:'Detección de anomalías de comportamiento de usuarios y entidades',cl:true},
+        {t:'Casos de uso: insider threat, exfiltración, escalación de privilegios, APT',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:4,compId:'ndr',icon:'📶',name:'NDR',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'NDR.1',title:'Despliegue de sensores NDR',tags:['T','C'],steps:[
+        {t:'Sensores en puntos estratégicos de la red para captura de tráfico este-oeste',cl:true},
+        {t:'Integración con logs de firewalls y NAC',cl:false}
+      ]},
+      {num:'NDR.2',title:'Baseline y alertas de comportamiento anómalo',tags:['T'],steps:[
+        {t:'Línea base de tráfico normal por zona segmentada',cl:false},
+        {t:'Alertas por comunicaciones inter-zona no autorizadas',cl:false},
+        {t:'Detección de movimiento lateral y exfiltración lenta',cl:false}
+      ]},
+      {num:'NDR.3',title:'Integración con SIEM para correlación',tags:['T'],steps:[
+        {t:'NDR como fuente adicional de eventos en SIEM',cl:false},
+        {t:'Correlación de incidentes: vista unificada FW + Endpoint + NDR + Identidad',cl:false}
+      ]}
+    ]
+  },
+  {
+    phaseId:4,compId:'soc',icon:'🎯',name:'SOC · CSIRT · CTI',
+    clientReq:true,status:'ok',
+    hitos:[
+      {num:'SOC.1',title:'Estructura organizacional del SOC',tags:['T','C'],steps:[
+        {t:'Definir modelo: SOC interno, híbrido o externalizado (MSSP)',cl:true},
+        {t:'Roles y responsabilidades: Tier 1/2/3, Threat Hunter, CTI Analyst',cl:false}
+      ]},
+      {num:'SOC.2',title:'Procesos de gestión de incidentes (CSIRT)',tags:['T','C'],steps:[
+        {t:'Proceso: Detección → Análisis → Contención → Erradicación → Recuperación',cl:true},
+        {t:'Playbooks SOAR para los 10 escenarios de incidente más probables para CENTROSUR',cl:false},
+        {t:'Simulacros de incidentes periódicos',cl:false}
+      ]},
+      {num:'SOC.3',title:'CTI — Cyber Threat Intelligence',tags:['T','C'],steps:[
+        {t:'Feeds de inteligencia especializados en sector eléctrico y OT/ICS',cl:true},
+        {t:'Integración de IoC en tiempo real con FW y SIEM',cl:false},
+        {t:'Reportes de amenazas relevantes a la dirección de CENTROSUR',cl:false}
+      ]},
+      {num:'SOC.4',title:'Threat Hunting continuo',tags:['T'],steps:[
+        {t:'Ejercicios de Threat Hunting periódicos',cl:false},
+        {t:'Búsqueda proactiva de APTs que no activan alertas automáticas',cl:false},
+        {t:'Playblocks: prevención colaborativa y automatizada de amenazas',cl:false}
+      ]}
+    ]
+  }
+];
+
+// ══════════════════════
+// RENDER MAP
+// ══════════════════════
+const phC={1:'#e8a020',2:'#3b82f6',3:'#22c55e',4:'#a855f7'};
+const phBG={1:'rgba(232,160,32,.1)',2:'rgba(59,130,246,.1)',3:'rgba(34,197,94,.1)',4:'rgba(168,85,247,.1)'};
+const phBD={1:'rgba(232,160,32,.28)',2:'rgba(59,130,246,.28)',3:'rgba(34,197,94,.28)',4:'rgba(168,85,247,.28)'};
+let selId=null, nodeEls={};
+
+function buildMap(){
+  const cols={1:document.getElementById('col-1'),2:document.getElementById('col-2'),3:document.getElementById('col-3'),4:document.getElementById('col-4')};
+  NODES.forEach(n=>{
+    const el=document.createElement('div');
+    el.className=`nc h${n.phase}${n.status==='warn'?' wc':''}`;
+    el.id=`node-${n.id}`;
+    el.setAttribute('data-id',n.id);
+    const depCnt=n.deps.length;
+    const linksTo=NODES.filter(x=>x.deps.includes(n.id)).length;
+    el.innerHTML=`
+      <div class="nc-top">
+        <div><div class="nc-name">${n.name}</div><div class="nc-sub">${n.sub}</div></div>
+        <div class="nc-icons">
+          ${n.clientReq?'<div class="ic ic-client" title="Solicitado por CENTROSUR">C</div>':''}
+          ${n.status==='warn'?'<div class="ic ic-warn" title="Requiere definición">!</div>':''}
+        </div>
+      </div>
+      <div class="nc-row">
+        <div class="nc-bgs">${n.badges.map(b=>`<span class="bg ${b==='Confirmado'?'bg-ok':b.includes('def')||b.includes('verif')?'bg-wn':'bg-dp'}">${b}</span>`).join('')}</div>
+        ${(depCnt+linksTo)>0?`<div class="nc-dc">${depCnt>0?`↑${depCnt}`:''}${depCnt>0&&linksTo>0?' ':''}${linksTo>0?`↓${linksTo}`:''}</div>`:''}
+      </div>`;
+    el.addEventListener('click',e=>{e.stopPropagation();selectNode(n.id);});
+    cols[n.col].appendChild(el);
+    nodeEls[n.id]=el;
+  });
+  document.body.addEventListener('click',()=>{if(selId){selId=null;clearHL();closePanel();}});
+}
+
+function selectNode(id){
+  selId=(selId===id)?null:id;
+  if(selId){hlNode(selId);showPanel(selId);}
+  else{clearHL();closePanel();}
+}
+
+function hlNode(id){
+  const n=NODES.find(x=>x.id===id);
+  const deps=n.deps;
+  const tgts=NODES.filter(x=>x.deps.includes(id)).map(x=>x.id);
+  const rel=new Set([id,...deps,...tgts]);
+  NODES.forEach(nd=>{
+    const el=nodeEls[nd.id];
+    el.classList.remove('sel','dep-hi','dim');
+    if(nd.id===id)el.classList.add('sel');
+    else if(rel.has(nd.id))el.classList.add('dep-hi');
+    else el.classList.add('dim');
+  });
+  drawConn(id);
+}
+
+function clearHL(){NODES.forEach(nd=>{nodeEls[nd.id].classList.remove('sel','dep-hi','dim');});drawConn(null);}
+
+function getRect(id){
+  const el=nodeEls[id];
+  const board=document.getElementById('board');
+  const br=board.getBoundingClientRect();
+  const er=el.getBoundingClientRect();
+  return{x:er.left-br.left,y:er.top-br.top,w:er.width,h:er.height,cx:er.left-br.left+er.width/2,cy:er.top-br.top+er.height/2};
+}
+
+function drawConn(activeId){
+  const svg=document.getElementById('connSvg');
+  const board=document.getElementById('board');
+  svg.setAttribute('width',board.scrollWidth);
+  svg.setAttribute('height',board.scrollHeight);
+  svg.innerHTML='';
+  NODES.forEach(n=>{
+    n.deps.forEach(depId=>{
+      try{
+        const f=getRect(depId),t=getRect(n.id);
+        const x1=f.x+f.w-1,y1=f.cy,x2=t.x+1,y2=t.cy;
+        const mx=(x1+x2)/2;
+        const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d',`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+        path.setAttribute('class','cp');
+        path.setAttribute('stroke',phC[n.phase]);
+        if(activeId){
+          const act=(n.id===activeId||depId===activeId);
+          act?path.classList.add('act'):path.classList.add('fad');
+        }
+        svg.appendChild(path);
+      }catch(e){}
+    });
+  });
+}
+
+function showPanel(id){
+  const n=NODES.find(x=>x.id===id);
+  const deps=n.deps.map(d=>NODES.find(x=>x.id===d));
+  const tgts=NODES.filter(x=>x.deps.includes(id));
+  const panel=document.getElementById('panel');
+  const pi=document.getElementById('pi');
+  panel.classList.add('open');
+  let warnH=n.warn?`<div class="warn-bx"><div class="warn-bx-t">⚠ Necesita definición</div><div class="warn-bx-b">${n.warn}</div></div>`:'';
+  let actH=n.actions&&n.actions.length?`<div class="sec"><div class="sec-lbl">Acciones requeridas</div><div class="act-bx"><div class="act-bx-t">Qué debe hacer CENTROSUR</div>${n.actions.map(a=>`<div class="act-i">${a}</div>`).join('')}</div></div>`:'';
+  let depsH=deps.length?`<div class="sec"><div class="sec-lbl">Depende de</div><div class="chips">${deps.map(d=>`<span class="chip" onclick="event.stopPropagation();selectNode('${d.id}')" style="color:${phC[d.phase]};background:${phBG[d.phase]};border-color:${phBD[d.phase]}">${d.name}</span>`).join('')}</div></div>`:'';
+  let tgtsH=tgts.length?`<div class="sec"><div class="sec-lbl">Habilita</div><div class="chips">${tgts.map(t=>`<span class="chip" onclick="event.stopPropagation();selectNode('${t.id}')" style="color:${phC[t.phase]};background:${phBG[t.phase]};border-color:${phBD[t.phase]}">${t.name}</span>`).join('')}</div></div>`:'';
+  pi.innerHTML=`
+    <div class="p-bar" style="background:${phC[n.phase]}"></div>
+    <div class="p-head">
+      <button class="p-close" onclick="event.stopPropagation();selId=null;clearHL();closePanel()">✕</button>
+      <div class="p-ph" style="color:${phC[n.phase]}">Fase ${n.phase} · ${PYEAR[n.phase]} · ${PNAME[n.phase]}</div>
+      <div class="p-title">${n.name}${n.clientReq?' <span style="font-size:9px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);padding:1px 5px;border-radius:3px;font-weight:700;vertical-align:middle;letter-spacing:.04em">C</span>':''}</div>
+      <div class="p-sub">${n.sub}</div>
+    </div>
+    <div class="p-body">
+      ${warnH}
+      <div class="sec"><div class="sec-lbl">Qué es</div><div class="sec-txt">${n.what}</div></div>
+      <div class="sec"><div class="sec-lbl">Por qué en esta fase</div><div class="sec-txt">${n.why}</div></div>
+      <div class="sec"><div class="sec-lbl">Para qué sirve</div><div class="sec-txt">${n.goal}</div></div>
+      ${actH}${depsH}${tgtsH}
+    </div>`;
+}
+
+function closePanel(){
+  document.getElementById('panel').classList.remove('open');
+  setTimeout(()=>{document.getElementById('pi').innerHTML='<div class="empty-p"><div class="ei">◎</div><div class="et">Selecciona un componente para ver detalle completo, dependencias y relaciones.</div></div>';},200);
+}
+
+// ══════════════════════
+// RENDER HITOS — sidebar nav
+// ══════════════════════
+const pnames={1:'Protección Perimetral',2:'Identidad y Acceso',3:'Servicios y Riesgos',4:'Detección e Inteligencia'};
+let activeCompId=null;
+
+function buildHitos(){
+  const nav=document.getElementById('phaseNav');
+  const scroll=document.getElementById('hitosScroll');
+  const byPhase={1:[],2:[],3:[],4:[]};
+  HITOS_DATA.forEach(c=>byPhase[c.phaseId].push(c));
+
+  // Build nav + panels
+  [1,2,3,4].forEach(ph=>{
+    const comps=byPhase[ph];
+    // phase section label
+    const secLabel=document.createElement('div');
+    secLabel.className='pnav-section';
+    secLabel.style.color=phC[ph];
+    secLabel.textContent=`Fase ${ph} · ${PYEAR[ph]}`;
+    nav.appendChild(secLabel);
+
+    comps.forEach((comp,i)=>{
+      // NAV BUTTON
+      const btn=document.createElement('div');
+      btn.className='cnav-btn';
+      btn.id=`cnav-${comp.compId}`;
+      const warnDot=comp.status==='warn'?`<div class="cnav-badge" style="background:var(--warn)"></div>`:`<div class="cnav-badge" style="background:var(--ok)"></div>`;
+      btn.innerHTML=`<span class="cnav-icon">${comp.icon}</span><span class="cnav-name">${comp.name}</span>${warnDot}`;
+      btn.addEventListener('click',()=>showComp(comp.compId));
+      nav.appendChild(btn);
+
+      // CONTENT PANEL
+      const panel=document.createElement('div');
+      panel.className='comp-panel';
+      panel.id=`cpanel-${comp.compId}`;
+
+      // warn box if needed
+      const nodeData=NODES.find(x=>x.id===comp.compId);
+      if(comp.status==='warn'&&nodeData&&nodeData.warn){
+        const wb=document.createElement('div');
+        wb.className='warn-comp-bx';
+        wb.innerHTML=`<div class="warn-comp-t">⚠ Requiere definición antes de implementar</div><div class="warn-comp-b">${nodeData.warn}</div>`;
+        panel.appendChild(wb);
+      }
+
+      // banner
+      const banner=document.createElement('div');
+      banner.className='comp-banner';
+      banner.style.background=phBG[ph];
+      banner.style.borderColor=phBD[ph];
+      const statusBadge=comp.status==='ok'?'<span class="cbadge cbadge-ok">✓ Confirmado</span>':'<span class="cbadge cbadge-wn">! Requiere definición</span>';
+      const clientBadge=comp.clientReq?'<span class="cbadge cbadge-cl">C Cliente</span>':'';
+      banner.innerHTML=`<span class="comp-banner-icon">${comp.icon}</span><span class="comp-banner-name" style="color:${phC[ph]}">${comp.name}</span><div class="comp-banner-badges">${clientBadge}${statusBadge}</div>`;
+      panel.appendChild(banner);
+
+      // hitos
+      comp.hitos.forEach(h=>{
+        const hitoEl=document.createElement('div');
+        hitoEl.className='hito';
+        const tagsHtml=h.tags.map(t=>`<span class="htag ${t==='C'?'htag-cl':'htag-tc'}">${t==='C'?'C Cliente':'T Técnico'}</span>`).join('');
+        const stepsHtml=h.steps.map(s=>`<div class="step${s.cl?' step-cl':''}"><div class="step-dot"></div><span>${s.t}${s.cl?` <span style="font-size:8px;font-weight:700;background:rgba(59,130,246,.15);color:#60a5fa;padding:1px 4px;border-radius:3px;margin-left:3px">C</span>`:''}</span></div>`).join('');
+        hitoEl.innerHTML=`<div class="hito-head">
+          <span class="hito-num" style="background:${phBG[ph]};color:${phC[ph]}">${h.num}</span>
+          <div class="hito-title">${h.title}</div>
+          <div class="hito-tags">${tagsHtml}</div>
+        </div><div class="steps">${stepsHtml}</div>`;
+        panel.appendChild(hitoEl);
+      });
+
+      scroll.appendChild(panel);
+    });
+
+    // divider between phases
+    if(ph<4){const d=document.createElement('div');d.className='pnav-divider';nav.appendChild(d);}
+  });
+
+  // activate first
+  const first=HITOS_DATA[0];
+  if(first) showComp(first.compId);
+}
+
+function showComp(compId){
+  activeCompId=compId;
+  const comp=HITOS_DATA.find(c=>c.compId===compId);
+  const ph=comp.phaseId;
+
+  // update nav active
+  document.querySelectorAll('.cnav-btn').forEach(b=>b.classList.remove('active'));
+  const navBtn=document.getElementById(`cnav-${compId}`);
+  if(navBtn){
+    navBtn.classList.add('active');
+    navBtn.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+
+  // update topbar
+  document.getElementById('htbPhase').textContent=`Fase ${ph} · ${pnames[ph]}`;
+  document.getElementById('htbPhase').style.color=phC[ph];
+  document.getElementById('htbComp').textContent=comp.name;
+  document.getElementById('htbCount').textContent=`${comp.hitos.length} hito${comp.hitos.length!==1?'s':''}`;
+
+  // show panel
+  document.querySelectorAll('.comp-panel').forEach(p=>p.classList.remove('active'));
+  const panel=document.getElementById(`cpanel-${compId}`);
+  if(panel){
+    panel.classList.add('active');
+    document.getElementById('hitosScroll').scrollTop=0;
+  }
+}
+
+// ══════════════════════
+// TABS
+// ══════════════════════
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const t=btn.getAttribute('data-tab');
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`tab-${t}`).classList.add('active');
+    if(t==='map')setTimeout(()=>drawConn(selId),50);
+  });
+});
+
+buildMap();
+buildHitos();
+setTimeout(()=>drawConn(null),120);
+window.addEventListener('resize',()=>drawConn(selId));
+document.getElementById('board').addEventListener('scroll',()=>drawConn(selId));
+</script>
+</body>
+</html>
